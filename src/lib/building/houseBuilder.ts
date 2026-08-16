@@ -78,6 +78,8 @@ function specFor(kind: OpeningKind, floor: number) {
       return { w: 0.92, h: 1.12, yOff: 1.1, shutter: "none" as const, balcony: false, arch: false, door: false, bars: false };
     case "rect-guard":
       return { w: 1.08, h: floor === 1 ? 1.88 : 1.64, yOff: 0.66, shutter: "open" as const, balcony: false, arch: false, door: false, bars: false };
+    case "lattice":
+      return { w: 1.05, h: 1.38, yOff: 1.0, shutter: "none" as const, balcony: false, arch: false, door: false, bars: true };
   }
 }
 

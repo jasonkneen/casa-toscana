@@ -40,7 +40,8 @@ export type OpeningKind =
   | "louver"
   | "louver-low"
   | "blind"
-  | "rect-guard";
+  | "rect-guard"
+  | "lattice";
 
 export type Opening = {
   face: Face;
@@ -50,7 +51,7 @@ export type Opening = {
 };
 
 const OPENINGS: Opening[] = [
-  { face: "front", along: -3.18, floor: 0, kind: "barred" },
+  { face: "front", along: -3.18, floor: 0, kind: "lattice" },
   { face: "front", along: 0, floor: 0, kind: "arch-door" },
   { face: "front", along: 3.18, floor: 0, kind: "small" },
   { face: "front", along: -3.18, floor: 1, kind: "rect-shutter" },
@@ -101,6 +102,7 @@ type Spec = {
   lintel: boolean;
   blind?: boolean;
   guard?: boolean;
+  lattice?: boolean;
 };
 
 function specFor(kind: OpeningKind, floor: number): Spec {
@@ -213,6 +215,19 @@ function specFor(kind: OpeningKind, floor: number): Spec {
         door: true,
         bars: false,
         lintel: true,
+      };
+    case "lattice":
+      return {
+        w: 1.08,
+        h: 1.42,
+        yOff: 1.0,
+        shutter: "none",
+        balcony: false,
+        arch: false,
+        door: false,
+        bars: false,
+        lintel: false,
+        lattice: true,
       };
     case "barred":
       return {
@@ -945,6 +960,22 @@ function addOpening(b: Batches, o: Opening) {
     if (green || !spec.arch) {
       const knob = worldAt(o.face, o.along, yBottom + spec.h * 0.48, spec.w * 0.18, 0.1);
       addKnobZ(b.iron, 0.035, 0.05, knob.x, knob.y, knob.z, ry);
+    }
+  }
+
+  if (spec.lattice) {
+    // Dense painted-green lattice grille, like the parlour window in the sheet.
+    const cols = 5;
+    const rows = 8;
+    for (let i = 0; i < cols; i++) {
+      const lx = (i / (cols - 1) - 0.5) * spec.w * 0.84;
+      const q = worldAt(o.face, o.along, yCenter, lx, 0.1);
+      addBox(b.shutter, 0.035, spec.h * 0.9, 0.025, q.x, q.y, q.z, ry, 1.4);
+    }
+    for (let i = 0; i < rows; i++) {
+      const yy = yBottom + spec.h * ((i + 0.5) / rows);
+      const q = worldAt(o.face, o.along, yy, 0, 0.1);
+      addBox(b.shutter, spec.w * 0.88, 0.035, 0.025, q.x, q.y, q.z, ry, 1.4);
     }
   }
 
