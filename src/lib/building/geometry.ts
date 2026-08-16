@@ -783,15 +783,32 @@ function addBalcony(b: Batches, face: Face, along: number, ySlab: number, width:
   const p = worldAt(face, along, ySlab, 0, depth / 2);
   addBox(b.stone, width, 0.09, depth, p.x, ySlab, p.z, p.ry, 0.7);
   const railH = 0.9;
+  const yMid = ySlab + railH * 0.52;
   const bars = Math.max(7, Math.round(width / 0.13));
   for (let i = 0; i < bars; i++) {
     const lx = (i / (bars - 1) - 0.5) * (width - 0.1);
-    const q = worldAt(face, along, ySlab + railH / 2, lx, depth - 0.05);
-    addBox(b.iron, 0.022, railH, 0.022, q.x, q.y, q.z);
+    const q = worldAt(face, along, (yMid + ySlab + railH) / 2, lx, depth - 0.05);
+    addBox(b.iron, 0.022, ySlab + railH - yMid, 0.022, q.x, q.y, q.z);
+  }
+  // ornamental ring band below the mid rail, like the lacework in the sheet
+  const yBand = (yMid + ySlab + 0.12) / 2;
+  const rRing = Math.min(0.16, (yMid - ySlab - 0.12) * 0.44);
+  const rings = Math.max(3, Math.floor((width - 0.3) / 0.34));
+  for (let r = 0; r < rings; r++) {
+    const cx = (r - (rings - 1) / 2) * ((width - 0.3) / rings);
+    let prev: { x: number; y: number; z: number } | null = null;
+    for (let i = 0; i <= 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      const pt = worldAt(face, along, yBand + Math.sin(a) * rRing, cx + Math.cos(a) * rRing, depth - 0.05);
+      if (prev) addSeg(b.iron, prev.x, prev.y, prev.z, pt.x, pt.y, pt.z, 0.014, 0.014);
+      prev = pt;
+    }
+    const stem = worldAt(face, along, yBand, cx, depth - 0.05);
+    addBox(b.iron, 0.016, rRing * 2, 0.016, stem.x, stem.y, stem.z);
   }
   const top = worldAt(face, along, ySlab + railH, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.03, 0.03, top.x, top.y, top.z, top.ry);
-  const mid = worldAt(face, along, ySlab + railH * 0.55, 0, depth - 0.05);
+  const mid = worldAt(face, along, yMid, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.02, 0.02, mid.x, mid.y, mid.z, mid.ry);
   const bot = worldAt(face, along, ySlab + 0.12, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.018, 0.018, bot.x, bot.y, bot.z, bot.ry);
