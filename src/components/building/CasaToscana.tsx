@@ -37,7 +37,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.9,
     metalness: 0,
     bumpScale: 0.014,
-    color: "#f2dfad",
+    color: "#eedcae",
   },
   brick: {
     map: "/textures/brick.jpg",
@@ -55,6 +55,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.78,
     metalness: 0.02,
     bumpScale: 0.012,
+    color: "#e7e0cf",
   },
   roof: {
     map: "/textures/roof.jpg",

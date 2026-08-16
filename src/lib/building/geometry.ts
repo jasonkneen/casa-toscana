@@ -825,10 +825,10 @@ function addOpening(b: Batches, o: Opening) {
 
   const glass = worldAt(o.face, o.along, yCenter, 0, 0.04);
   if (!spec.door) {
-    const gw = spec.w * 0.7;
-    const gh = spec.h * 0.76;
+    const gw = spec.w * 0.84;
+    const gh = spec.h * 0.86;
     if (spec.arch) {
-      addArchSolid(b.glass, spec.w * 0.72, spec.h * 0.8, 0.02, glass.x, yBottom + 0.08, glass.z, ry);
+      addArchSolid(b.glass, spec.w * 0.85, spec.h * 0.9, 0.02, glass.x, yBottom + 0.05, glass.z, ry);
     } else {
       addBox(b.glass, gw, gh, 0.018, glass.x, yCenter + 0.01, glass.z, ry);
     }
@@ -967,7 +967,7 @@ function addOpening(b: Batches, o: Opening) {
     const sw = spec.w * 0.48;
     const sh = spec.h * 0.98;
     if (spec.shutter === "open") {
-      const hinge = spec.w / 2 + 0.18;
+      const hinge = spec.w / 2 + 0.05;
       for (const side of [-1, 1]) {
         const q = worldAt(o.face, o.along, yCenter, side * (hinge + sw / 2), 0.09);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
@@ -1149,8 +1149,8 @@ export function listWindowPorts(): WindowPort[] {
     ports.push({
       position: [p.x, p.y, p.z],
       rotationY: faceYaw(o.face),
-      width: spec.arch ? spec.w * 0.66 : spec.w * 0.64,
-      height: spec.arch ? spec.h * 0.68 : spec.h * 0.7,
+      width: spec.arch ? spec.w * 0.8 : spec.w * 0.78,
+      height: spec.arch ? spec.h * 0.78 : spec.h * 0.8,
       floor: o.floor,
       room: roomFor(o),
     });

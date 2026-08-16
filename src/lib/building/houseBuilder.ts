@@ -534,9 +534,9 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
     if (s.arch) archSolid(b.interior, s.w * 0.92, s.h * 0.94, 0.34, well.x, yBottom + 0.02, well.z, ry);
     else addBox(b.interior, s.w * 0.92, s.h * 0.92, 0.34, well.x, yCenter, well.z, ry);
     const glass = at(yCenter, 0, 0.04);
-    const gw = s.w * 0.7;
-    const gh = s.h * 0.76;
-    if (s.arch) archSolid(b.glass, s.w * 0.72, s.h * 0.8, 0.02, glass.x, yBottom + 0.08, glass.z, ry);
+    const gw = s.w * 0.84;
+    const gh = s.h * 0.86;
+    if (s.arch) archSolid(b.glass, s.w * 0.85, s.h * 0.9, 0.02, glass.x, yBottom + 0.05, glass.z, ry);
     else addBox(b.glass, gw, gh, 0.018, glass.x, yCenter + 0.01, glass.z, ry);
     const t = 0.05;
     addBox(b.stone, t, gh, 0.045, at(yCenter, -gw / 2 + t / 2, 0.07).x, yCenter, at(yCenter, -gw / 2 + t / 2, 0.07).z, ry, 1.6);
@@ -590,7 +590,7 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
     const sw = s.w * 0.48;
     const sh = s.h * 0.98;
     if (s.shutter === "open") {
-      const hinge = s.w / 2 + 0.18;
+      const hinge = s.w / 2 + 0.05;
       for (const side of [-1, 1]) {
         const q = at(yCenter, side * (hinge + sw / 2), 0.09);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
@@ -773,8 +773,8 @@ export function buildHouse(p: HousePlan): HouseBuild {
       ports.push({
         position: [q.x, q.y, q.z],
         rotationY: yaw(o.face),
-        width: s.arch ? s.w * 0.66 : s.w * 0.64,
-        height: s.arch ? s.h * 0.68 : s.h * 0.7,
+        width: s.arch ? s.w * 0.8 : s.w * 0.78,
+        height: s.arch ? s.h * 0.78 : s.h * 0.8,
         floor: o.floor,
         room: roomFor(o),
       });
