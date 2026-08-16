@@ -539,12 +539,12 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
     if (s.arch) archSolid(b.glass, s.w * 0.72, s.h * 0.8, 0.02, glass.x, yBottom + 0.08, glass.z, ry);
     else addBox(b.glass, gw, gh, 0.018, glass.x, yCenter + 0.01, glass.z, ry);
     const t = 0.05;
-    addBox(b.wood, t, gh, 0.045, at(yCenter, -gw / 2 + t / 2, 0.07).x, yCenter, at(yCenter, -gw / 2 + t / 2, 0.07).z, ry, 1.6);
-    addBox(b.wood, t, gh, 0.045, at(yCenter, gw / 2 - t / 2, 0.07).x, yCenter, at(yCenter, gw / 2 - t / 2, 0.07).z, ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, glass.x, yCenter - gh / 2 + t / 2, glass.z, ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, glass.x, yCenter + gh / 2 - t / 2, glass.z, ry, 1.6);
-    addBox(b.wood, 0.038, gh - t * 1.6, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
-    addBox(b.wood, gw - t * 1.6, 0.038, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, at(yCenter, -gw / 2 + t / 2, 0.07).x, yCenter, at(yCenter, -gw / 2 + t / 2, 0.07).z, ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, at(yCenter, gw / 2 - t / 2, 0.07).x, yCenter, at(yCenter, gw / 2 - t / 2, 0.07).z, ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, glass.x, yCenter - gh / 2 + t / 2, glass.z, ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, glass.x, yCenter + gh / 2 - t / 2, glass.z, ry, 1.6);
+    addBox(b.stone, 0.038, gh - t * 1.6, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
+    addBox(b.stone, gw - t * 1.6, 0.038, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
   }
 
   if (s.arch && s.door) {
@@ -592,9 +592,7 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
     if (s.shutter === "open") {
       const hinge = s.w / 2 + 0.18;
       for (const side of [-1, 1]) {
-        const back = at(yCenter, side * (hinge + sw / 2), 0.03);
-        addBox(b.stucco, sw + 0.1, sh + 0.12, 0.035, back.x, back.y, back.z, ry, 0.5);
-        const q = at(yCenter, side * (hinge + sw / 2), 0.2);
+        const q = at(yCenter, side * (hinge + sw / 2), 0.09);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
       }
     } else {

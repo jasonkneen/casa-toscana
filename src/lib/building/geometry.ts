@@ -776,6 +776,8 @@ function addBalcony(b: Batches, face: Face, along: number, ySlab: number, width:
   }
   const top = worldAt(face, along, ySlab + railH, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.03, 0.03, top.x, top.y, top.z, top.ry);
+  const mid = worldAt(face, along, ySlab + railH * 0.55, 0, depth - 0.05);
+  addBox(b.iron, width - 0.06, 0.02, 0.02, mid.x, mid.y, mid.z, mid.ry);
   const bot = worldAt(face, along, ySlab + 0.12, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.018, 0.018, bot.x, bot.y, bot.z, bot.ry);
   for (const side of [-1, 1]) {
@@ -832,12 +834,12 @@ function addOpening(b: Batches, o: Opening) {
     }
     const t = 0.05;
     const flz = 0.07;
-    addBox(b.wood, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, -gw / 2 + t / 2, flz)), ry, 1.6);
-    addBox(b.wood, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, gw / 2 - t / 2, flz)), ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter - gh / 2 + t / 2, 0, flz)), ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter + gh / 2 - t / 2, 0, flz)), ry, 1.6);
-    addBox(b.wood, 0.038, gh - t * 1.6, 0.04, ...xyz(worldAt(o.face, o.along, yCenter, 0, flz + 0.01)), ry, 1.6);
-    addBox(b.wood, gw - t * 1.6, 0.038, 0.04, ...xyz(worldAt(o.face, o.along, yCenter - gh * 0.04, 0, flz + 0.01)), ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, -gw / 2 + t / 2, flz)), ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, gw / 2 - t / 2, flz)), ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter - gh / 2 + t / 2, 0, flz)), ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter + gh / 2 - t / 2, 0, flz)), ry, 1.6);
+    addBox(b.stone, 0.038, gh - t * 1.6, 0.04, ...xyz(worldAt(o.face, o.along, yCenter, 0, flz + 0.01)), ry, 1.6);
+    addBox(b.stone, gw - t * 1.6, 0.038, 0.04, ...xyz(worldAt(o.face, o.along, yCenter - gh * 0.04, 0, flz + 0.01)), ry, 1.6);
   }
 
   if (spec.arch) {
@@ -969,9 +971,9 @@ function addOpening(b: Batches, o: Opening) {
       for (const side of [-1, 1]) {
         const q = worldAt(o.face, o.along, yCenter, side * (hinge + sw / 2), 0.09);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
-        addBox(b.wood, sw * 0.9, 0.045, 0.055, q.x, q.y + sh * 0.4, q.z, ry, 1.3);
-        addBox(b.wood, sw * 0.9, 0.045, 0.055, q.x, q.y - sh * 0.4, q.z, ry, 1.3);
-        addBox(b.wood, sw * 0.9, 0.045, 0.055, q.x, q.y, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.9, 0.045, 0.055, q.x, q.y + sh * 0.4, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.9, 0.045, 0.055, q.x, q.y - sh * 0.4, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.9, 0.045, 0.055, q.x, q.y, q.z, ry, 1.3);
         addBox(
           b.iron,
           0.03,
@@ -984,8 +986,8 @@ function addOpening(b: Batches, o: Opening) {
       for (const side of [-1, 1]) {
         const q = worldAt(o.face, o.along, yCenter, side * (sw / 2 + 0.015), 0.16);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
-        addBox(b.wood, sw * 0.88, 0.04, 0.055, q.x, q.y + sh * 0.38, q.z, ry, 1.3);
-        addBox(b.wood, sw * 0.88, 0.04, 0.055, q.x, q.y - sh * 0.38, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.88, 0.04, 0.055, q.x, q.y + sh * 0.38, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.88, 0.04, 0.055, q.x, q.y - sh * 0.38, q.z, ry, 1.3);
       }
     }
   }
