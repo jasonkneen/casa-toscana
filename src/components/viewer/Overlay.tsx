@@ -68,7 +68,7 @@ export function Overlay({
             Borgo Toscano
           </h1>
           <p className="mt-2 max-w-sm text-sm text-muted">
-            A Florentine street — the palazzetto from the elevations, and four
+            A Florentine street — the palazzetto from the elevations, and seven
             kin built with the same walls, storeys, and coppi.
           </p>
         </div>
@@ -80,7 +80,7 @@ export function Overlay({
           <Row label="Triangles" value={tris ? tris.toLocaleString() : "—"} />
           <Row label="Draw calls" value={calls ? String(calls) : "—"} />
           <Row label="Units" value="1 u = 1 m" />
-          <Row label="Houses" value="5 kin" />
+          <Row label="Houses" value="8 kin" />
         </Panel>
         <Panel>
           <label className="flex items-center justify-between text-xs text-muted">
