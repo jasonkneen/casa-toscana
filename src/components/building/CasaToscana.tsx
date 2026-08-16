@@ -37,6 +37,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.9,
     metalness: 0,
     bumpScale: 0.014,
+    color: "#f2dfad",
   },
   brick: {
     map: "/textures/brick.jpg",
@@ -45,6 +46,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.86,
     metalness: 0,
     bumpScale: 0.02,
+    color: "#c39479",
   },
   stone: {
     map: "/textures/stone.jpg",
@@ -61,7 +63,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.7,
     metalness: 0,
     bumpScale: 0.05,
-    color: "#e8d2b6",
+    color: "#dbc3a5",
   },
   wood: {
     map: "/textures/wood.jpg",
@@ -168,10 +170,12 @@ export function CasaToscana({
   wireframe = false,
   lamp = 0,
   frost = 0,
+  heroOnly = false,
 }: {
   wireframe?: boolean;
   lamp?: number;
   frost?: number;
+  heroOnly?: boolean;
 }) {
   const textures = usePreparedTextures();
   const geos = useMemo(() => buildCasa(), [GEOM_REV]);
@@ -236,7 +240,7 @@ export function CasaToscana({
           />
         </mesh>
       ))}
-      {STREET_PLANS.map((row) => (
+      {heroOnly ? null : STREET_PLANS.map((row) => (
         <TuscanHouse
           key={row.plan.id}
           plan={row.plan}
@@ -247,7 +251,7 @@ export function CasaToscana({
           frost={frost}
         />
       ))}
-      {CATALOG.map((row) => (
+      {heroOnly ? null : CATALOG.map((row) => (
         <TuscanHouse
           key={row.plan.id}
           plan={row.plan}
@@ -260,7 +264,7 @@ export function CasaToscana({
         />
       ))}
       <NumberPlate n="18" position={[2.4, 2.7, 4.78]} />
-      <InteriorPortals lamp={lamp} frost={frost} extraPorts={extraPorts} />
+      <InteriorPortals lamp={lamp} frost={frost} extraPorts={heroOnly ? [] : extraPorts} />
     </group>
   );
 }

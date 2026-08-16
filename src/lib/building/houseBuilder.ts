@@ -72,6 +72,12 @@ function specFor(kind: OpeningKind, floor: number) {
       return { w: 0.74, h: 0.84, yOff: 1.66, shutter: "none" as const, balcony: false, arch: false, door: false, bars: true };
     case "louver":
       return { w: 1.08, h: 1.64, yOff: 0.66, shutter: "closed" as const, balcony: false, arch: false, door: false, bars: false };
+    case "louver-low":
+      return { w: 0.92, h: 1.14, yOff: 1.1, shutter: "closed" as const, balcony: false, arch: false, door: false, bars: false };
+    case "blind":
+      return { w: 0.92, h: 1.12, yOff: 1.1, shutter: "none" as const, balcony: false, arch: false, door: false, bars: false };
+    case "rect-guard":
+      return { w: 1.08, h: floor === 1 ? 1.88 : 1.64, yOff: 0.66, shutter: "open" as const, balcony: false, arch: false, door: false, bars: false };
   }
 }
 
