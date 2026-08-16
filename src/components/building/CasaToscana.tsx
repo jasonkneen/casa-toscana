@@ -5,7 +5,6 @@ import {
   ASSET_META,
   GEOM_REV,
   buildCasa,
-  buildRoofFaces,
   type MatId,
 } from "@/lib/building/geometry";
 import { InteriorPortals } from "@/components/building/InteriorPortals";
@@ -14,6 +13,8 @@ import { NumberPlate } from "@/components/building/NumberPlate";
 import { STREET_PLANS } from "@/lib/building/plans";
 import { CATALOG } from "@/lib/building/catalog";
 import { BUILD_REV, buildHouse } from "@/lib/building/houseBuilder";
+import { applyWeathering } from "@/lib/building/weathering";
+import { CoppiRoof } from "@/components/building/CoppiRoof";
 import type { WindowPort } from "@/lib/building/geometry";
 
 type Maps = {
@@ -37,6 +38,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.9,
     metalness: 0,
     bumpScale: 0.014,
+    color: "#eedcae",
   },
   brick: {
     map: "/textures/brick.jpg",
@@ -45,6 +47,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.86,
     metalness: 0,
     bumpScale: 0.02,
+    color: "#c39479",
   },
   stone: {
     map: "/textures/stone.jpg",
@@ -53,6 +56,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.78,
     metalness: 0.02,
     bumpScale: 0.012,
+    color: "#e7e0cf",
   },
   roof: {
     map: "/textures/roof.jpg",
@@ -61,7 +65,7 @@ const MATS: Record<MatId, Maps> = {
     roughness: 0.7,
     metalness: 0,
     bumpScale: 0.05,
-    color: "#e8d2b6",
+    color: "#dbc3a5",
   },
   wood: {
     map: "/textures/wood.jpg",
@@ -168,18 +172,15 @@ export function CasaToscana({
   wireframe = false,
   lamp = 0,
   frost = 0,
+  heroOnly = false,
 }: {
   wireframe?: boolean;
   lamp?: number;
   frost?: number;
+  heroOnly?: boolean;
 }) {
   const textures = usePreparedTextures();
   const geos = useMemo(() => buildCasa(), [GEOM_REV]);
-  const roofFaces = useMemo(() => buildRoofFaces(), [GEOM_REV]);
-
-  const roofDef = MATS.roof;
-  const roofMap = textures[roofDef.map];
-  const roofBump = roofDef.bump ? textures[roofDef.bump] : undefined;
 
   const extraPorts = useMemo(() => {
     const all: WindowPort[] = [];
@@ -212,31 +213,8 @@ export function CasaToscana({
           frost={frost}
         />
       ))}
-      {roofFaces.map((g, i) => (
-        <mesh
-          key={`roof-${i}`}
-          name={`roof-face-${i}`}
-          geometry={g}
-          castShadow
-          receiveShadow
-          frustumCulled={false}
-          dispose={null}
-        >
-          <meshStandardMaterial
-            map={roofMap}
-            bumpMap={wireframe ? undefined : roofBump}
-            bumpScale={roofDef.bumpScale}
-            color={roofDef.color ?? "#ffffff"}
-            roughness={roofDef.roughness}
-            metalness={0}
-            wireframe={wireframe}
-            side={THREE.DoubleSide}
-            depthWrite
-            depthTest
-          />
-        </mesh>
-      ))}
-      {STREET_PLANS.map((row) => (
+      <CoppiRoof wireframe={wireframe} />
+      {heroOnly ? null : STREET_PLANS.map((row) => (
         <TuscanHouse
           key={row.plan.id}
           plan={row.plan}
@@ -247,7 +225,7 @@ export function CasaToscana({
           frost={frost}
         />
       ))}
-      {CATALOG.map((row) => (
+      {heroOnly ? null : CATALOG.map((row) => (
         <TuscanHouse
           key={row.plan.id}
           plan={row.plan}
@@ -260,7 +238,7 @@ export function CasaToscana({
         />
       ))}
       <NumberPlate n="18" position={[2.4, 2.7, 4.78]} />
-      <InteriorPortals lamp={lamp} frost={frost} extraPorts={extraPorts} />
+      <InteriorPortals lamp={lamp} frost={frost} extraPorts={heroOnly ? [] : extraPorts} />
     </group>
   );
 }
@@ -298,6 +276,9 @@ function Part({
       dispose={null}
     >
       <meshStandardMaterial
+        onUpdate={(m: THREE.Material) => {
+          if (!wireframe && (id === "stucco" || id === "brick")) applyWeathering(m, id);
+        }}
         map={isGlass || id === "interior" || id === "iron" ? undefined : map}
         bumpMap={wireframe ? undefined : bump}
         bumpScale={def.bumpScale}

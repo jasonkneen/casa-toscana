@@ -72,6 +72,14 @@ function specFor(kind: OpeningKind, floor: number) {
       return { w: 0.74, h: 0.84, yOff: 1.66, shutter: "none" as const, balcony: false, arch: false, door: false, bars: true };
     case "louver":
       return { w: 1.08, h: 1.64, yOff: 0.66, shutter: "closed" as const, balcony: false, arch: false, door: false, bars: false };
+    case "louver-low":
+      return { w: 0.92, h: 1.14, yOff: 1.1, shutter: "closed" as const, balcony: false, arch: false, door: false, bars: false };
+    case "blind":
+      return { w: 0.92, h: 1.12, yOff: 1.1, shutter: "none" as const, balcony: false, arch: false, door: false, bars: false };
+    case "rect-guard":
+      return { w: 1.08, h: floor === 1 ? 1.88 : 1.64, yOff: 0.66, shutter: "open" as const, balcony: false, arch: false, door: false, bars: false };
+    case "lattice":
+      return { w: 1.05, h: 1.38, yOff: 1.0, shutter: "none" as const, balcony: false, arch: false, door: false, bars: true };
   }
 }
 
@@ -528,17 +536,17 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
     if (s.arch) archSolid(b.interior, s.w * 0.92, s.h * 0.94, 0.34, well.x, yBottom + 0.02, well.z, ry);
     else addBox(b.interior, s.w * 0.92, s.h * 0.92, 0.34, well.x, yCenter, well.z, ry);
     const glass = at(yCenter, 0, 0.04);
-    const gw = s.w * 0.7;
-    const gh = s.h * 0.76;
-    if (s.arch) archSolid(b.glass, s.w * 0.72, s.h * 0.8, 0.02, glass.x, yBottom + 0.08, glass.z, ry);
+    const gw = s.w * 0.84;
+    const gh = s.h * 0.86;
+    if (s.arch) archSolid(b.glass, s.w * 0.85, s.h * 0.9, 0.02, glass.x, yBottom + 0.05, glass.z, ry);
     else addBox(b.glass, gw, gh, 0.018, glass.x, yCenter + 0.01, glass.z, ry);
     const t = 0.05;
-    addBox(b.wood, t, gh, 0.045, at(yCenter, -gw / 2 + t / 2, 0.07).x, yCenter, at(yCenter, -gw / 2 + t / 2, 0.07).z, ry, 1.6);
-    addBox(b.wood, t, gh, 0.045, at(yCenter, gw / 2 - t / 2, 0.07).x, yCenter, at(yCenter, gw / 2 - t / 2, 0.07).z, ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, glass.x, yCenter - gh / 2 + t / 2, glass.z, ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, glass.x, yCenter + gh / 2 - t / 2, glass.z, ry, 1.6);
-    addBox(b.wood, 0.038, gh - t * 1.6, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
-    addBox(b.wood, gw - t * 1.6, 0.038, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, at(yCenter, -gw / 2 + t / 2, 0.07).x, yCenter, at(yCenter, -gw / 2 + t / 2, 0.07).z, ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, at(yCenter, gw / 2 - t / 2, 0.07).x, yCenter, at(yCenter, gw / 2 - t / 2, 0.07).z, ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, glass.x, yCenter - gh / 2 + t / 2, glass.z, ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, glass.x, yCenter + gh / 2 - t / 2, glass.z, ry, 1.6);
+    addBox(b.stone, 0.038, gh - t * 1.6, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
+    addBox(b.stone, gw - t * 1.6, 0.038, 0.04, glass.x, yCenter, at(yCenter, 0, 0.08).z, ry, 1.6);
   }
 
   if (s.arch && s.door) {
@@ -584,11 +592,9 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
     const sw = s.w * 0.48;
     const sh = s.h * 0.98;
     if (s.shutter === "open") {
-      const hinge = s.w / 2 + 0.18;
+      const hinge = s.w / 2 + 0.05;
       for (const side of [-1, 1]) {
-        const back = at(yCenter, side * (hinge + sw / 2), 0.03);
-        addBox(b.stucco, sw + 0.1, sh + 0.12, 0.035, back.x, back.y, back.z, ry, 0.5);
-        const q = at(yCenter, side * (hinge + sw / 2), 0.2);
+        const q = at(yCenter, side * (hinge + sw / 2), 0.09);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
       }
     } else {
@@ -769,8 +775,8 @@ export function buildHouse(p: HousePlan): HouseBuild {
       ports.push({
         position: [q.x, q.y, q.z],
         rotationY: yaw(o.face),
-        width: s.arch ? s.w * 0.66 : s.w * 0.64,
-        height: s.arch ? s.h * 0.68 : s.h * 0.7,
+        width: s.arch ? s.w * 0.8 : s.w * 0.78,
+        height: s.arch ? s.h * 0.78 : s.h * 0.8,
         floor: o.floor,
         room: roomFor(o),
       });

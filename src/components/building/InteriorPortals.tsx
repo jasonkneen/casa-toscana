@@ -113,14 +113,17 @@ const FRAG = /* glsl */ `
     float spot = exp(-dot(uv - vec2(0.5, 0.58), uv - vec2(0.5, 0.58)) * 5.0);
     vec3 dim = tex * mix(0.38, 0.14, smoothstep(0.5, 0.88, lum));
     vec3 night = dim * mix(vec3(0.5, 0.42, 0.32), warm, 0.4 + spot * 0.6) + warm * spot * 0.3;
-    vec3 col = mix(tex, night, lamp);
+    // By day the rooms read dim and neutral behind the glass, not lamp-lit.
+    vec3 day = tex * 0.52;
+    day = mix(day, vec3(dot(day, vec3(0.33))), 0.18);
+    vec3 col = mix(day, night, lamp);
 
     vec3 milk = vec3(0.8, 0.84, 0.88);
     float grey = dot(col, vec3(0.33));
     col = mix(col, vec3(grey), frost * 0.45);
     col = mix(col, mix(col, milk, 0.62), frost);
     col = mix(col, milk, frost * fres * 0.4);
-    col = mix(col, vec3(0.74, 0.8, 0.84), fres * 0.18 * (1.0 - lamp));
+    col = mix(col, vec3(0.74, 0.8, 0.84), (0.1 + fres * 0.3) * (1.0 - lamp));
 
     gl_FragColor = vec4(col, 1.0);
   }

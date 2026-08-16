@@ -6,9 +6,9 @@ export const W = 10.8;
 export const D = 9.4;
 export const WALL_T = 0.36;
 export const EAVE_Y = 13.35;
-export const ROOF_H = 3.2;
+export const ROOF_H = 2.1;
 export const OVERHANG = 0.46;
-export const ROOF_RIDGE = Math.max(0.4, (W - D) / 2 + 0.2);
+export const ROOF_RIDGE = 1.6;
 export const FLOOR_Y = [0, 3.48, 6.72, 9.98, 13.35] as const;
 
 export type Face = "front" | "back" | "left" | "right";
@@ -37,7 +37,11 @@ export type OpeningKind =
   | "carriage"
   | "barred"
   | "small"
-  | "louver";
+  | "louver"
+  | "louver-low"
+  | "blind"
+  | "rect-guard"
+  | "lattice";
 
 export type Opening = {
   face: Face;
@@ -47,7 +51,7 @@ export type Opening = {
 };
 
 const OPENINGS: Opening[] = [
-  { face: "front", along: -3.18, floor: 0, kind: "barred" },
+  { face: "front", along: -3.18, floor: 0, kind: "lattice" },
   { face: "front", along: 0, floor: 0, kind: "arch-door" },
   { face: "front", along: 3.18, floor: 0, kind: "small" },
   { face: "front", along: -3.18, floor: 1, kind: "rect-shutter" },
@@ -60,41 +64,30 @@ const OPENINGS: Opening[] = [
   { face: "front", along: 0, floor: 3, kind: "arch-balcony" },
   { face: "front", along: 3.18, floor: 3, kind: "rect-shutter" },
 
-  { face: "left", along: 2.15, floor: 0, kind: "barred" },
-  { face: "left", along: 2.15, floor: 1, kind: "rect-shutter" },
-  { face: "left", along: 2.15, floor: 2, kind: "rect-shutter" },
-  { face: "left", along: 2.15, floor: 3, kind: "rect-shutter" },
-  { face: "left", along: -1.05, floor: 0, kind: "small" },
-  { face: "left", along: -2.2, floor: 0, kind: "rect-door" },
-  { face: "left", along: -2.2, floor: 1, kind: "rect-shutter" },
-  { face: "left", along: -2.2, floor: 2, kind: "rect-balcony" },
-  { face: "left", along: -2.2, floor: 3, kind: "rect-shutter" },
+  { face: "left", along: 1.35, floor: 0, kind: "barred" },
+  { face: "left", along: -0.55, floor: 0, kind: "blind" },
+  { face: "left", along: 1.35, floor: 1, kind: "rect-shutter" },
+  { face: "left", along: 1.35, floor: 2, kind: "louver" },
+  { face: "left", along: 1.35, floor: 3, kind: "rect-shutter" },
+  { face: "left", along: -3.55, floor: 0, kind: "plank-arch" },
 
-  { face: "right", along: 2.35, floor: 0, kind: "barred" },
-  { face: "right", along: 2.35, floor: 1, kind: "rect-shutter" },
-  { face: "right", along: 2.35, floor: 2, kind: "rect-shutter" },
-  { face: "right", along: 2.35, floor: 3, kind: "rect-shutter" },
-  { face: "right", along: -1.05, floor: 0, kind: "barred" },
-  { face: "right", along: -2.35, floor: 0, kind: "barred" },
-  { face: "right", along: -1.05, floor: 1, kind: "rect-shutter" },
-  { face: "right", along: -2.35, floor: 1, kind: "rect-balcony" },
-  { face: "right", along: -1.05, floor: 2, kind: "louver" },
-  { face: "right", along: -2.35, floor: 2, kind: "rect-shutter" },
-  { face: "right", along: -1.05, floor: 3, kind: "rect-shutter" },
-  { face: "right", along: -2.35, floor: 3, kind: "rect-shutter" },
+  { face: "right", along: 3.5, floor: 0, kind: "barred" },
+  { face: "right", along: 1.5, floor: 0, kind: "louver-low" },
+  { face: "right", along: 1.5, floor: 1, kind: "louver" },
+  { face: "right", along: 1.5, floor: 2, kind: "louver" },
+  { face: "right", along: 1.5, floor: 3, kind: "louver" },
 
-  { face: "back", along: -2.7, floor: 0, kind: "barred" },
-  { face: "back", along: -0.15, floor: 0, kind: "small" },
-  { face: "back", along: 2.55, floor: 0, kind: "rect-door" },
-  { face: "back", along: -2.75, floor: 1, kind: "rect-shutter" },
+  { face: "back", along: -2.9, floor: 0, kind: "louver-low" },
+  { face: "back", along: 0, floor: 0, kind: "barred" },
+  { face: "back", along: 2.9, floor: 0, kind: "rect-door" },
+  { face: "back", along: -2.75, floor: 1, kind: "rect-guard" },
   { face: "back", along: 0, floor: 1, kind: "rect-shutter" },
-  { face: "back", along: 2.75, floor: 1, kind: "rect-shutter" },
-  { face: "back", along: -2.75, floor: 2, kind: "rect-shutter" },
+  { face: "back", along: -2.75, floor: 2, kind: "rect-guard" },
   { face: "back", along: 0, floor: 2, kind: "rect-shutter" },
-  { face: "back", along: 2.75, floor: 2, kind: "rect-shutter" },
-  { face: "back", along: -2.75, floor: 3, kind: "small" },
+  { face: "back", along: 2.75, floor: 2, kind: "rect-guard" },
+  { face: "back", along: -2.75, floor: 3, kind: "rect-shutter" },
   { face: "back", along: 0, floor: 3, kind: "rect-shutter" },
-  { face: "back", along: 2.75, floor: 3, kind: "rect-shutter" },
+  { face: "back", along: 2.9, floor: 3, kind: "small" },
 ];
 
 type Spec = {
@@ -107,6 +100,9 @@ type Spec = {
   door: boolean;
   bars: boolean;
   lintel: boolean;
+  blind?: boolean;
+  guard?: boolean;
+  lattice?: boolean;
 };
 
 function specFor(kind: OpeningKind, floor: number): Spec {
@@ -122,6 +118,19 @@ function specFor(kind: OpeningKind, floor: number): Spec {
         door: false,
         bars: false,
         lintel: floor === 1,
+      };
+    case "rect-guard":
+      return {
+        w: 1.12,
+        h: floor === 1 ? 1.92 : 1.72,
+        yOff: floor === 0 ? 0.7 : 0.68,
+        shutter: "open",
+        balcony: false,
+        arch: false,
+        door: false,
+        bars: false,
+        lintel: floor === 1,
+        guard: true,
       };
     case "arch-balcony":
       return {
@@ -207,11 +216,24 @@ function specFor(kind: OpeningKind, floor: number): Spec {
         bars: false,
         lintel: true,
       };
+    case "lattice":
+      return {
+        w: 1.08,
+        h: 1.42,
+        yOff: 1.0,
+        shutter: "none",
+        balcony: false,
+        arch: false,
+        door: false,
+        bars: false,
+        lintel: false,
+        lattice: true,
+      };
     case "barred":
       return {
-        w: 0.86,
-        h: 0.96,
-        yOff: 1.72,
+        w: 1.0,
+        h: 1.3,
+        yOff: 1.05,
         shutter: "none",
         balcony: false,
         arch: false,
@@ -221,9 +243,9 @@ function specFor(kind: OpeningKind, floor: number): Spec {
       };
     case "small":
       return {
-        w: 0.78,
-        h: 0.88,
-        yOff: 1.7,
+        w: 0.92,
+        h: 1.1,
+        yOff: 1.15,
         shutter: "none",
         balcony: false,
         arch: false,
@@ -242,6 +264,31 @@ function specFor(kind: OpeningKind, floor: number): Spec {
         door: false,
         bars: false,
         lintel: false,
+      };
+    case "louver-low":
+      return {
+        w: 0.95,
+        h: 1.18,
+        yOff: 1.12,
+        shutter: "closed",
+        balcony: false,
+        arch: false,
+        door: false,
+        bars: false,
+        lintel: false,
+      };
+    case "blind":
+      return {
+        w: 0.95,
+        h: 1.15,
+        yOff: 1.12,
+        shutter: "none",
+        balcony: false,
+        arch: false,
+        door: false,
+        bars: false,
+        lintel: false,
+        blind: true,
       };
   }
 }
@@ -348,6 +395,27 @@ function addSeg(
   );
   const m = new THREE.Matrix4();
   m.compose(new THREE.Vector3((ax + bx) / 2, (ay + by) / 2, (az + bz) / 2), q, new THREE.Vector3(1, 1, 1));
+  g.applyMatrix4(m);
+  batch.push(g);
+}
+
+function addKnobZ(
+  batch: THREE.BufferGeometry[],
+  r: number,
+  len: number,
+  x: number,
+  y: number,
+  z: number,
+  ry: number,
+) {
+  const g = new THREE.CylinderGeometry(r, r * 0.55, len, 10);
+  g.rotateX(Math.PI / 2);
+  const m = new THREE.Matrix4();
+  m.compose(
+    new THREE.Vector3(x, y, z),
+    new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ry, 0)),
+    new THREE.Vector3(1, 1, 1),
+  );
   g.applyMatrix4(m);
   batch.push(g);
 }
@@ -484,7 +552,7 @@ function addArchFrame(
   batch.push(g);
 }
 
-export const GEOM_REV = 19;
+export const GEOM_REV = 20;
 
 export function roofHeightAt(x: number, z: number) {
   const hx = W / 2 + OVERHANG;
@@ -500,40 +568,28 @@ function addWalls(b: Batches) {
   const h = EAVE_Y;
   const hw = W / 2;
   const hd = D / 2;
-  // Stucco toward the street (+Z), brick toward the garden (−Z).
-  const split = 0.35;
+  // Stucco toward the street (+Z), exposed brick toward the garden (−Z),
+  // wrapping the rear corners: rear half of both flanks + the right span of
+  // the back wall (per the elevation sheet).
+  const splitL = -0.4;
+  const splitR = 0.3;
 
   addBox(b.stucco, W - 2 * t, h, t, 0, h / 2, hd - t / 2, 0, 0.55);
 
-  const backBrickW = W * 0.34;
   const backClear = W - 2 * t;
-  const backLeft = -hw + t;
-  addBox(b.brick, backBrickW, h, t, backLeft + backBrickW / 2, h / 2, -hd + t / 2, 0, 0.7);
-  addBox(
-    b.stucco,
-    backClear - backBrickW,
-    h,
-    t,
-    backLeft + backBrickW + (backClear - backBrickW) / 2,
-    h / 2,
-    -hd + t / 2,
-    0,
-    0.55,
-  );
+  const backBrickW = 3.3;
+  const bx0 = hw - t - backBrickW;
+  addBox(b.brick, backBrickW, h, t, bx0 + backBrickW / 2, h / 2, -hd + t / 2, 0, 0.7);
+  addBox(b.stucco, backClear - backBrickW, h, t, (-hw + t + bx0) / 2, h / 2, -hd + t / 2, 0, 0.55);
 
-  addBox(b.stucco, t, h, hd - split, -hw + t / 2, h / 2, (hd + split) / 2, 0, 0.55);
-  addBox(b.brick, t, h, split + hd, -hw + t / 2, h / 2, (split - hd) / 2, 0, 0.7);
+  addBox(b.stucco, t, h, hd - splitL, -hw + t / 2, h / 2, (hd + splitL) / 2, 0, 0.55);
+  addBox(b.brick, t, h, splitL + hd, -hw + t / 2, h / 2, (splitL - hd) / 2, 0, 0.7);
 
-  addBox(b.stucco, t, h, hd - split, hw - t / 2, h / 2, (hd + split) / 2, 0, 0.55);
-  addBox(b.brick, t, h, split + hd, hw - t / 2, h / 2, (split - hd) / 2, 0, 0.7);
+  addBox(b.stucco, t, h, hd - splitR, hw - t / 2, h / 2, (hd + splitR) / 2, 0, 0.55);
+  addBox(b.brick, t, h, splitR + hd, hw - t / 2, h / 2, (splitR - hd) / 2, 0, 0.7);
 
   addBox(b.stone, W - 0.2, 0.12, D - 0.2, 0, 0.04, 0, 0, 0.4);
   addBox(b.interior, W - t * 2, 0.08, D - t * 2, 0, h - 0.06, 0, 0, 0.2);
-
-  const dadoH = 1.2;
-  addBox(b.stone, W - 0.1, dadoH, 0.03, 0, dadoH / 2, hd + 0.012, 0, 0.45);
-  addBox(b.stone, 0.03, dadoH, hd - split, -hw - 0.012, dadoH / 2, (hd + split) / 2, 0, 0.45);
-  addBox(b.stone, 0.03, dadoH, hd - split, hw + 0.012, dadoH / 2, (hd + split) / 2, 0, 0.45);
 }
 
 function addPlinthAndCornices(b: Batches) {
@@ -545,7 +601,36 @@ function addPlinthAndCornices(b: Batches) {
     addBox(b.stone, depth, th, D + out * 2, -hw - out * 0.5 - 0.02, y, 0, 0, 0.55);
     addBox(b.stone, depth, th, D + out * 2, hw + out * 0.5 + 0.02, y, 0, 0, 0.55);
   };
-  band(0.26, 0.52, 0.05, 0.12);
+  // Base course, broken around the ground-floor doors.
+  const baseSegs = (face: Face, len: number) => {
+    const gaps = OPENINGS.filter((o) => o.face === face && o.floor === 0 && specFor(o.kind, 0).door)
+      .map((o) => {
+        const s = specFor(o.kind, 0);
+        return { a0: o.along - s.w / 2 - 0.4, a1: o.along + s.w / 2 + 0.4 };
+      })
+      .sort((p, q) => p.a0 - q.a0);
+    const half = len / 2;
+    const out: { c: number; w: number }[] = [];
+    let cur = -half;
+    for (const g of gaps) {
+      if (g.a0 > cur + 0.05) out.push({ c: (cur + g.a0) / 2, w: g.a0 - cur });
+      cur = Math.max(cur, g.a1);
+    }
+    if (half - cur > 0.05) out.push({ c: (cur + half) / 2, w: half - cur });
+    return out;
+  };
+  for (const s of baseSegs("front", W + 0.07)) {
+    addBox(b.stone, s.w, 0.4, 0.09, s.c, 0.2, hd + 0.037, 0, 0.55);
+  }
+  for (const s of baseSegs("back", W + 0.07)) {
+    addBox(b.stone, s.w, 0.4, 0.09, s.c, 0.2, -hd - 0.037, 0, 0.55);
+  }
+  for (const s of baseSegs("left", D + 0.07)) {
+    addBox(b.stone, 0.09, 0.4, s.w, -hw - 0.037, 0.2, s.c, 0, 0.55);
+  }
+  for (const s of baseSegs("right", D + 0.07)) {
+    addBox(b.stone, 0.09, 0.4, s.w, hw + 0.037, 0.2, s.c, 0, 0.55);
+  }
   for (const y of [3.48, 6.72, 9.98]) {
     band(y, 0.11, 0.05, 0.1);
   }
@@ -553,79 +638,40 @@ function addPlinthAndCornices(b: Batches) {
   addBox(b.stone, W + 0.3, 0.08, D + 0.3, 0, EAVE_Y + 0.02, 0, 0, 0.4);
 }
 
-function reservedBays() {
-  return OPENINGS.map((o) => {
-    const spec = specFor(o.kind, o.floor);
-    const shutter = spec.shutter !== "none" ? spec.w * 0.52 + 0.24 : 0.18;
-    const pad = spec.w / 2 + shutter;
-    return {
-      face: o.face,
-      a0: o.along - pad,
-      a1: o.along + pad,
-      y0: FLOOR_Y[o.floor] + spec.yOff - 0.22,
-      y1: FLOOR_Y[o.floor] + spec.yOff + spec.h + 0.38,
-    };
-  });
-}
-
-function bayBlocked(
-  bays: ReturnType<typeof reservedBays>,
-  face: Face,
-  a0: number,
-  a1: number,
-  y0: number,
-  y1: number,
-) {
-  const lo = Math.min(a0, a1);
-  const hi = Math.max(a0, a1);
-  return bays.some((b) => b.face === face && lo < b.a1 && hi > b.a0 && y0 < b.y1 && y1 > b.y0);
-}
-
 function addQuoins(b: Batches) {
+  // Flat pietra-serena corner chains on the two street corners only —
+  // continuous stacked blocks with alternating long/short faces, barely
+  // proud of the stucco (the rear corners stay plain brick).
   const hw = W / 2;
   const hd = D / 2;
-  const thick = 0.11;
-  const lift = thick / 2 + 0.012;
-  const flush = lift + thick / 2;
-  const step = 0.34;
-  const bays = reservedBays();
-  let y = 0.55;
-  let i = 0;
-  while (y + 0.16 < EAVE_Y - 0.15) {
-    const hh = i % 2 === 0 ? 0.3 : 0.26;
-    const ext = i % 2 === 0 ? 0.4 : 0.28;
-    const y0 = y;
-    const y1 = y + hh;
-    const corners: [number, number, number, number, Face, Face][] = [
-      [-hw, hd, 1, 1, "front", "left"],
-      [hw, hd, -1, 1, "front", "right"],
-      [-hw, -hd, 1, -1, "back", "left"],
-      [hw, -hd, -1, -1, "back", "right"],
-    ];
-    for (const [cx, cz, sx, sz, faceA, faceB] of corners) {
-      const a0 = cx;
-      const a1 = cx + sx * ext;
-      if (!bayBlocked(bays, faceA, a0, a1, y0, y1)) {
-        addBox(b.stone, ext, hh, thick, cx + sx * (ext / 2), y + hh / 2, cz + sz * lift, 0, 0.7);
-      }
-      const z0 = cz - sz * ext;
-      const z1 = cz + sz * flush;
-      if (!bayBlocked(bays, faceB, z0, z1, y0, y1)) {
-        addBox(
-          b.stone,
-          thick,
-          hh,
-          ext + flush,
-          cx - sx * lift,
-          y + hh / 2,
-          cz - sz * ((ext - flush) / 2),
-          0,
-          0.7,
-        );
-      }
+  const thick = 0.035;
+  const lift = thick / 2 + 0.008;
+  const yTop = EAVE_Y - 0.16;
+  const corners: [number, number][] = [
+    [-hw, 1],
+    [hw, -1],
+  ];
+  for (const [cx, sx] of corners) {
+    let y = 0.42;
+    let i = 0;
+    while (y < yTop) {
+      const hh = Math.min(i % 2 === 0 ? 0.34 : 0.3, yTop - y);
+      const ext = i % 2 === 0 ? 0.46 : 0.34;
+      addBox(b.stone, ext, hh - 0.008, thick, cx + sx * (ext / 2), y + hh / 2, hd + lift, 0, 0.7);
+      addBox(
+        b.stone,
+        thick,
+        hh - 0.008,
+        i % 2 === 0 ? 0.34 : 0.46,
+        cx - sx * lift,
+        y + hh / 2,
+        hd - (i % 2 === 0 ? 0.34 : 0.46) / 2,
+        0,
+        0.7,
+      );
+      y += hh;
+      i += 1;
     }
-    y += step;
-    i += 1;
   }
 }
 
@@ -699,20 +745,21 @@ function faceGeometry(pts: THREE.Vector3[], uvPerMeter: number): THREE.BufferGeo
 }
 
 function addChimneys(b: Batches) {
+  // Slim stacks clustered near the ridge, tops just clear of it.
+  const ridgeY = EAVE_Y + ROOF_H;
   const spots: [number, number, number][] = [
-    [-3.7, 1.45, 1.15],
-    [-0.95, 1.7, 1.05],
-    [3.55, 1.35, 1.2],
-    [-3.35, -1.55, 1.1],
-    [0.75, -1.75, 1.05],
-    [3.45, -1.4, 1.15],
+    [-2.7, 0.7, ridgeY + 0.75],
+    [-0.5, -0.7, ridgeY + 0.95],
+    [1.4, 0.65, ridgeY + 0.7],
+    [3.2, -0.6, ridgeY + 0.85],
   ];
-  for (const [x, z, h] of spots) {
+  for (const [x, z, top] of spots) {
     const y0 = roofHeightAt(x, z) - 0.12;
-    addBox(b.brick, 0.58, h, 0.46, x, y0 + h / 2, z, 0, 0.9);
-    addBox(b.stone, 0.66, 0.07, 0.54, x, y0 + h + 0.04, z, 0, 0.6);
-    addCyl(b.terracotta, 0.11, 0.13, 0.28, x - 0.12, y0 + h + 0.22, z, 8);
-    addCyl(b.terracotta, 0.1, 0.12, 0.24, x + 0.13, y0 + h + 0.2, z + 0.02, 8);
+    const h = top - y0;
+    addBox(b.stucco, 0.52, h, 0.44, x, y0 + h / 2, z, 0, 0.9);
+    addBox(b.stone, 0.6, 0.07, 0.52, x, y0 + h + 0.04, z, 0, 0.6);
+    addCyl(b.terracotta, 0.1, 0.12, 0.26, x - 0.11, y0 + h + 0.2, z, 8);
+    addCyl(b.terracotta, 0.09, 0.11, 0.22, x + 0.12, y0 + h + 0.18, z + 0.02, 8);
   }
 }
 
@@ -732,18 +779,37 @@ function addDownspouts(b: Batches) {
 }
 
 function addBalcony(b: Batches, face: Face, along: number, ySlab: number, width: number) {
-  const depth = 0.62;
+  const depth = 0.3;
   const p = worldAt(face, along, ySlab, 0, depth / 2);
   addBox(b.stone, width, 0.09, depth, p.x, ySlab, p.z, p.ry, 0.7);
   const railH = 0.9;
+  const yMid = ySlab + railH * 0.52;
   const bars = Math.max(7, Math.round(width / 0.13));
   for (let i = 0; i < bars; i++) {
     const lx = (i / (bars - 1) - 0.5) * (width - 0.1);
-    const q = worldAt(face, along, ySlab + railH / 2, lx, depth - 0.05);
-    addBox(b.iron, 0.022, railH, 0.022, q.x, q.y, q.z);
+    const q = worldAt(face, along, (yMid + ySlab + railH) / 2, lx, depth - 0.05);
+    addBox(b.iron, 0.022, ySlab + railH - yMid, 0.022, q.x, q.y, q.z);
+  }
+  // ornamental ring band below the mid rail, like the lacework in the sheet
+  const yBand = (yMid + ySlab + 0.12) / 2;
+  const rRing = Math.min(0.16, (yMid - ySlab - 0.12) * 0.44);
+  const rings = Math.max(3, Math.floor((width - 0.3) / 0.34));
+  for (let r = 0; r < rings; r++) {
+    const cx = (r - (rings - 1) / 2) * ((width - 0.3) / rings);
+    let prev: { x: number; y: number; z: number } | null = null;
+    for (let i = 0; i <= 10; i++) {
+      const a = (i / 10) * Math.PI * 2;
+      const pt = worldAt(face, along, yBand + Math.sin(a) * rRing, cx + Math.cos(a) * rRing, depth - 0.05);
+      if (prev) addSeg(b.iron, prev.x, prev.y, prev.z, pt.x, pt.y, pt.z, 0.014, 0.014);
+      prev = pt;
+    }
+    const stem = worldAt(face, along, yBand, cx, depth - 0.05);
+    addBox(b.iron, 0.016, rRing * 2, 0.016, stem.x, stem.y, stem.z);
   }
   const top = worldAt(face, along, ySlab + railH, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.03, 0.03, top.x, top.y, top.z, top.ry);
+  const mid = worldAt(face, along, yMid, 0, depth - 0.05);
+  addBox(b.iron, width - 0.06, 0.02, 0.02, mid.x, mid.y, mid.z, mid.ry);
   const bot = worldAt(face, along, ySlab + 0.12, 0, depth - 0.05);
   addBox(b.iron, width - 0.06, 0.018, 0.018, bot.x, bot.y, bot.z, bot.ry);
   for (const side of [-1, 1]) {
@@ -768,6 +834,20 @@ function addOpening(b: Batches, o: Opening) {
   const yCenter = yBottom + spec.h / 2;
   const ry = faceYaw(o.face);
 
+  if (spec.blind) {
+    // Finestra tamponata — a walled-up window: slim stone surround around a
+    // recessed stucco infill, plus the sill that never left.
+    const fc = worldAt(o.face, o.along, yCenter, 0, 0.018);
+    addBox(b.stucco, spec.w, spec.h, 0.03, fc.x, fc.y, fc.z, ry, 0.55);
+    addBox(b.stone, 0.1, spec.h + 0.2, 0.1, ...xyz(worldAt(o.face, o.along, yCenter, -spec.w / 2 - 0.05, 0.045)), ry, 0.7);
+    addBox(b.stone, 0.1, spec.h + 0.2, 0.1, ...xyz(worldAt(o.face, o.along, yCenter, spec.w / 2 + 0.05, 0.045)), ry, 0.7);
+    const ft = worldAt(o.face, o.along, yBottom + spec.h + 0.05, 0, 0.045);
+    addBox(b.stone, spec.w + 0.2, 0.1, 0.1, ft.x, ft.y, ft.z, ry, 0.7);
+    const sillB = worldAt(o.face, o.along, yBottom - 0.03, 0, 0.07);
+    addBox(b.stone, spec.w + 0.26, 0.07, 0.14, sillB.x, sillB.y, sillB.z, ry, 0.65);
+    return;
+  }
+
   const well = worldAt(o.face, o.along, yCenter, 0, -0.16);
   if (spec.arch) {
     addArchSolid(b.interior, spec.w * 0.92, spec.h * 0.94, 0.34, well.x, yBottom + 0.02, well.z, ry);
@@ -777,26 +857,37 @@ function addOpening(b: Batches, o: Opening) {
 
   const glass = worldAt(o.face, o.along, yCenter, 0, 0.04);
   if (!spec.door) {
-    const gw = spec.w * 0.7;
-    const gh = spec.h * 0.76;
+    const gw = spec.w * 0.84;
+    const gh = spec.h * 0.86;
     if (spec.arch) {
-      addArchSolid(b.glass, spec.w * 0.72, spec.h * 0.8, 0.02, glass.x, yBottom + 0.08, glass.z, ry);
+      addArchSolid(b.glass, spec.w * 0.85, spec.h * 0.9, 0.02, glass.x, yBottom + 0.05, glass.z, ry);
     } else {
       addBox(b.glass, gw, gh, 0.018, glass.x, yCenter + 0.01, glass.z, ry);
     }
     const t = 0.05;
     const flz = 0.07;
-    addBox(b.wood, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, -gw / 2 + t / 2, flz)), ry, 1.6);
-    addBox(b.wood, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, gw / 2 - t / 2, flz)), ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter - gh / 2 + t / 2, 0, flz)), ry, 1.6);
-    addBox(b.wood, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter + gh / 2 - t / 2, 0, flz)), ry, 1.6);
-    addBox(b.wood, 0.038, gh - t * 1.6, 0.04, ...xyz(worldAt(o.face, o.along, yCenter, 0, flz + 0.01)), ry, 1.6);
-    addBox(b.wood, gw - t * 1.6, 0.038, 0.04, ...xyz(worldAt(o.face, o.along, yCenter - gh * 0.04, 0, flz + 0.01)), ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, -gw / 2 + t / 2, flz)), ry, 1.6);
+    addBox(b.stone, t, gh, 0.045, ...xyz(worldAt(o.face, o.along, yCenter, gw / 2 - t / 2, flz)), ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter - gh / 2 + t / 2, 0, flz)), ry, 1.6);
+    addBox(b.stone, gw, t, 0.045, ...xyz(worldAt(o.face, o.along, yCenter + gh / 2 - t / 2, 0, flz)), ry, 1.6);
+    addBox(b.stone, 0.038, gh - t * 1.6, 0.04, ...xyz(worldAt(o.face, o.along, yCenter, 0, flz + 0.01)), ry, 1.6);
+    addBox(b.stone, gw - t * 1.6, 0.038, 0.04, ...xyz(worldAt(o.face, o.along, yCenter - gh * 0.04, 0, flz + 0.01)), ry, 1.6);
   }
 
   if (spec.arch) {
     const frame = worldAt(o.face, o.along, yBottom, 0, 0.05);
-    addArchFrame(b.stone, spec.w + 0.28, spec.h + 0.16, 0.14, 0.13, frame.x, yBottom - 0.04, frame.z, ry);
+    const bandW = spec.door ? 0.24 : 0.13;
+    addArchFrame(
+      b.stone,
+      spec.w + bandW * 2 + 0.02,
+      spec.h + bandW + 0.03,
+      spec.door ? 0.16 : 0.14,
+      bandW,
+      frame.x,
+      yBottom - 0.04,
+      frame.z,
+      ry,
+    );
   } else {
     const fw = spec.w + 0.26;
     const fh = spec.h + 0.22;
@@ -811,73 +902,98 @@ function addOpening(b: Batches, o: Opening) {
   addBox(b.stone, spec.w + 0.34, 0.08, 0.22, sill.x, sill.y, sill.z, ry, 0.65);
 
   if (spec.lintel && !spec.arch) {
-    const lin = worldAt(o.face, o.along, yBottom + spec.h + 0.18, 0, 0.09);
-    addBox(b.stone, spec.w + 0.5, 0.12, 0.18, lin.x, lin.y, lin.z, ry, 0.6);
-    addBox(b.stone, spec.w + 0.38, 0.06, 0.14, lin.x, lin.y + 0.08, lin.z, ry, 0.6);
+    const lin = worldAt(o.face, o.along, yBottom + spec.h + 0.18, 0, 0.08);
+    addBox(b.stone, spec.w + 0.44, 0.1, 0.16, lin.x, lin.y, lin.z, ry, 0.6);
   }
 
   if (spec.door) {
+    const green = o.face !== "front";
+    const leafMat = green ? b.shutter : b.wood;
     if (spec.arch) {
-      const spring = spec.h * 0.55;
-      const leafH = spring - 0.08;
+      // Leaves rise to the springing line; the lunette above carries
+      // wrought-iron scrollwork (per the door photo), not radial spokes.
+      const rad = spec.w * 0.46;
+      const spring = spec.h - rad - 0.06;
+      const leafH = spring - 0.1;
       for (const side of [-1, 1]) {
         const cx = side * spec.w * 0.235;
         const leaf = worldAt(o.face, o.along, yBottom + 0.06 + leafH / 2, cx, 0.07);
-        addBox(b.wood, spec.w * 0.45, leafH, 0.06, leaf.x, leaf.y, leaf.z, ry, 1.4);
-        addBox(b.wood, spec.w * 0.3, leafH * 0.34, 0.022, ...xyz(worldAt(o.face, o.along, yBottom + leafH * 0.68, cx, 0.095)), ry, 1.25);
-        addBox(b.wood, spec.w * 0.3, leafH * 0.28, 0.022, ...xyz(worldAt(o.face, o.along, yBottom + leafH * 0.28, cx, 0.095)), ry, 1.25);
+        addBox(leafMat, spec.w * 0.45, leafH, 0.06, leaf.x, leaf.y, leaf.z, ry, 1.4);
+        // two raised panels per leaf, tall over short, like the photo
+        addBox(leafMat, spec.w * 0.32, leafH * 0.36, 0.03, ...xyz(worldAt(o.face, o.along, yBottom + leafH * 0.66, cx, 0.112)), ry, 1.25);
+        addBox(leafMat, spec.w * 0.32, leafH * 0.3, 0.03, ...xyz(worldAt(o.face, o.along, yBottom + leafH * 0.26, cx, 0.112)), ry, 1.25);
+        if (!green) {
+          const kb = worldAt(o.face, o.along, yBottom + leafH * 0.5, cx, 0.11);
+          addKnobZ(b.iron, 0.042, 0.06, kb.x, kb.y, kb.z, ry);
+        }
       }
-      addBox(b.wood, 0.04, leafH, 0.04, ...xyz(worldAt(o.face, o.along, yBottom + 0.06 + leafH / 2, 0, 0.1)), ry, 1.3);
-      addBox(b.wood, spec.w * 0.88, 0.12, 0.03, ...xyz(worldAt(o.face, o.along, yBottom + 0.1, 0, 0.1)), ry, 1.2);
-      const cy = yBottom + spring;
-      const rad = spec.w * 0.46;
+      addBox(leafMat, 0.04, leafH, 0.04, ...xyz(worldAt(o.face, o.along, yBottom + 0.06 + leafH / 2, 0, 0.1)), ry, 1.3);
+      addBox(leafMat, spec.w * 0.88, 0.12, 0.03, ...xyz(worldAt(o.face, o.along, yBottom + 0.1, 0, 0.1)), ry, 1.2);
+      // transom bar at the springing line
+      addBox(b.stone, spec.w + 0.06, 0.09, 0.1, ...xyz(worldAt(o.face, o.along, yBottom + spring + 0.02, 0, 0.06)), ry, 0.6);
+      const cy = yBottom + spring + 0.07;
       const origin = worldAt(o.face, o.along, cy, 0, 0.055);
       addLunette(b.glass, rad, 0.018, origin.x, origin.y, origin.z, ry);
       const barZ = 0.09;
-      const hub = worldAt(o.face, o.along, cy, 0, barZ);
-      for (let i = 0; i <= 11; i++) {
-        const a = Math.PI * (i / 11);
-        const tip = worldAt(o.face, o.along, cy + Math.sin(a) * rad, Math.cos(a) * rad, barZ);
-        addSeg(b.iron, hub.x, hub.y, hub.z, tip.x, tip.y, tip.z, 0.012, 0.012);
-      }
-      for (let i = 0; i < 11; i++) {
-        const a0 = Math.PI * (i / 11);
-        const a1 = Math.PI * ((i + 1) / 11);
-        const p0 = worldAt(o.face, o.along, cy + Math.sin(a0) * rad, Math.cos(a0) * rad, barZ);
-        const p1 = worldAt(o.face, o.along, cy + Math.sin(a1) * rad, Math.cos(a1) * rad, barZ);
+      // border ring
+      for (let i = 0; i < 12; i++) {
+        const a0 = Math.PI * (i / 12);
+        const a1 = Math.PI * ((i + 1) / 12);
+        const r = rad * 0.94;
+        const p0 = worldAt(o.face, o.along, cy + Math.sin(a0) * r, Math.cos(a0) * r, barZ);
+        const p1 = worldAt(o.face, o.along, cy + Math.sin(a1) * r, Math.cos(a1) * r, barZ);
         addSeg(b.iron, p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, 0.014, 0.014);
       }
-      const blocks = 6;
-      const bh = spring / blocks;
-      for (let i = 0; i < blocks; i++) {
-        const extra = i % 2 === 0 ? 0.03 : 0;
-        const yy = yBottom + i * bh;
-        for (const side of [-1, 1]) {
-          const q = worldAt(o.face, o.along, yy + bh / 2, side * (spec.w / 2 + (0.2 + extra) / 2), 0.09);
-          addBox(b.stone, 0.2 + extra, bh - 0.012, 0.17 + extra, q.x, q.y, q.z, ry, 0.55);
+      // bottom rail + short centre stem
+      const bl = worldAt(o.face, o.along, cy + 0.015, 0, barZ);
+      addBox(b.iron, rad * 1.86, 0.024, 0.02, bl.x, bl.y, bl.z, ry);
+      const stemTop = worldAt(o.face, o.along, cy + rad * 0.5, 0, barZ);
+      addSeg(b.iron, bl.x, bl.y, bl.z, stemTop.x, stemTop.y, stemTop.z, 0.014, 0.014);
+      // mirrored S-scrolls
+      for (const side of [-1, 1]) {
+        const scx = side * rad * 0.44;
+        const scy = cy + rad * 0.34;
+        const r0 = rad * 0.36;
+        const turns = 1.65 * Math.PI;
+        const steps = 12;
+        let prev: { x: number; y: number; z: number } | null = null;
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const a = Math.PI * 0.5 + side * t * turns;
+          const r = r0 * (1 - 0.62 * t);
+          const px = scx + Math.cos(a) * r;
+          const py = scy + Math.sin(a) * r * 0.9;
+          const p = worldAt(o.face, o.along, py, px, barZ);
+          if (prev) addSeg(b.iron, prev.x, prev.y, prev.z, p.x, p.y, p.z, 0.013, 0.013);
+          prev = p;
         }
-      }
-      const vrad = spec.w / 2 + 0.1;
-      const vcy = yBottom + spring;
-      for (let i = 0; i < 9; i++) {
-        const a = Math.PI * ((i + 0.5) / 9);
-        const span = Math.PI / 20;
-        const p0 = worldAt(o.face, o.along, vcy + Math.sin(a - span) * vrad, Math.cos(a - span) * vrad, 0.1);
-        const p1 = worldAt(o.face, o.along, vcy + Math.sin(a + span) * vrad, Math.cos(a + span) * vrad, 0.1);
-        addSeg(b.stone, p0.x, p0.y, p0.z, p1.x, p1.y, p1.z, 0.18, 0.16);
       }
     } else {
       const leaf = worldAt(o.face, o.along, yCenter + 0.02, 0, 0.05);
-      addBox(b.wood, spec.w * 0.88, spec.h * 0.9, 0.07, leaf.x, leaf.y, leaf.z, ry, 1.3);
-      for (let i = -2; i <= 2; i++) {
-        const plank = worldAt(o.face, o.along, yCenter + 0.02, i * spec.w * 0.13, 0.09);
-        addBox(b.wood, 0.025, spec.h * 0.84, 0.02, plank.x, plank.y, plank.z, ry, 1.2);
-      }
-      const mid = worldAt(o.face, o.along, yBottom + spec.h * 0.52, 0, 0.09);
-      addBox(b.wood, spec.w * 0.82, 0.07, 0.03, mid.x, mid.y, mid.z, ry, 1.2);
+      addBox(leafMat, spec.w * 0.88, spec.h * 0.9, 0.07, leaf.x, leaf.y, leaf.z, ry, 1.3);
+      addBox(leafMat, spec.w * 0.6, spec.h * 0.34, 0.03, ...xyz(worldAt(o.face, o.along, yBottom + spec.h * 0.66, 0, 0.105)), ry, 1.25);
+      addBox(leafMat, spec.w * 0.6, spec.h * 0.28, 0.03, ...xyz(worldAt(o.face, o.along, yBottom + spec.h * 0.28, 0, 0.105)), ry, 1.25);
     }
-    const knob = worldAt(o.face, o.along, yBottom + spec.h * 0.48, spec.w * 0.18, 0.12);
-    addCyl(b.iron, 0.035, 0.035, 0.04, knob.x, knob.y, knob.z, 8);
+    if (green || !spec.arch) {
+      const knob = worldAt(o.face, o.along, yBottom + spec.h * 0.48, spec.w * 0.18, 0.1);
+      addKnobZ(b.iron, 0.035, 0.05, knob.x, knob.y, knob.z, ry);
+    }
+  }
+
+  if (spec.lattice) {
+    // Dense painted-green lattice grille, like the parlour window in the sheet.
+    const cols = 5;
+    const rows = 8;
+    for (let i = 0; i < cols; i++) {
+      const lx = (i / (cols - 1) - 0.5) * spec.w * 0.84;
+      const q = worldAt(o.face, o.along, yCenter, lx, 0.1);
+      addBox(b.shutter, 0.035, spec.h * 0.9, 0.025, q.x, q.y, q.z, ry, 1.4);
+    }
+    for (let i = 0; i < rows; i++) {
+      const yy = yBottom + spec.h * ((i + 0.5) / rows);
+      const q = worldAt(o.face, o.along, yy, 0, 0.1);
+      addBox(b.shutter, spec.w * 0.88, 0.035, 0.025, q.x, q.y, q.z, ry, 1.4);
+    }
   }
 
   if (spec.bars) {
@@ -899,15 +1015,13 @@ function addOpening(b: Batches, o: Opening) {
     const sw = spec.w * 0.48;
     const sh = spec.h * 0.98;
     if (spec.shutter === "open") {
-      const hinge = spec.w / 2 + 0.18;
+      const hinge = spec.w / 2 + 0.05;
       for (const side of [-1, 1]) {
-        const backing = worldAt(o.face, o.along, yCenter, side * (hinge + sw / 2), 0.03);
-        addBox(b.stucco, sw + 0.1, sh + 0.12, 0.035, backing.x, backing.y, backing.z, ry, 0.5);
-        const q = worldAt(o.face, o.along, yCenter, side * (hinge + sw / 2), 0.2);
+        const q = worldAt(o.face, o.along, yCenter, side * (hinge + sw / 2), 0.09);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
-        addBox(b.wood, sw * 0.9, 0.045, 0.055, q.x, q.y + sh * 0.4, q.z, ry, 1.3);
-        addBox(b.wood, sw * 0.9, 0.045, 0.055, q.x, q.y - sh * 0.4, q.z, ry, 1.3);
-        addBox(b.wood, sw * 0.9, 0.045, 0.055, q.x, q.y, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.9, 0.045, 0.055, q.x, q.y + sh * 0.4, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.9, 0.045, 0.055, q.x, q.y - sh * 0.4, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.9, 0.045, 0.055, q.x, q.y, q.z, ry, 1.3);
         addBox(
           b.iron,
           0.03,
@@ -920,14 +1034,35 @@ function addOpening(b: Batches, o: Opening) {
       for (const side of [-1, 1]) {
         const q = worldAt(o.face, o.along, yCenter, side * (sw / 2 + 0.015), 0.16);
         addBox(b.shutter, sw, sh, 0.05, q.x, q.y, q.z, ry, 1.2);
-        addBox(b.wood, sw * 0.88, 0.04, 0.055, q.x, q.y + sh * 0.38, q.z, ry, 1.3);
-        addBox(b.wood, sw * 0.88, 0.04, 0.055, q.x, q.y - sh * 0.38, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.88, 0.04, 0.055, q.x, q.y + sh * 0.38, q.z, ry, 1.3);
+        addBox(b.shutter, sw * 0.88, 0.04, 0.055, q.x, q.y - sh * 0.38, q.z, ry, 1.3);
       }
     }
   }
 
+  if (spec.guard) {
+    // Facade-flush window guard: a shallow iron rail across the lower half.
+    const gw = spec.w + 0.12;
+    const railH = 0.85;
+    const out = 0.17;
+    const bars = Math.max(5, Math.round(gw / 0.15));
+    for (let i = 0; i < bars; i++) {
+      const lx = (i / (bars - 1) - 0.5) * gw;
+      const q = worldAt(o.face, o.along, yBottom + railH / 2, lx, out);
+      addBox(b.iron, 0.02, railH, 0.02, q.x, q.y, q.z);
+    }
+    const top = worldAt(o.face, o.along, yBottom + railH, 0, out);
+    addBox(b.iron, gw + 0.04, 0.028, 0.028, top.x, top.y, top.z, top.ry);
+    const bot = worldAt(o.face, o.along, yBottom + 0.06, 0, out);
+    addBox(b.iron, gw + 0.04, 0.02, 0.02, bot.x, bot.y, bot.z, bot.ry);
+    for (const side of [-1, 1]) {
+      const arm = worldAt(o.face, o.along, yBottom + railH, side * (gw / 2), out / 2);
+      addBox(b.iron, 0.02, 0.02, out, arm.x, arm.y, arm.z, arm.ry);
+    }
+  }
+
   if (spec.balcony) {
-    addBalcony(b, o.face, o.along, yBottom - 0.12, spec.w + 0.85);
+    addBalcony(b, o.face, o.along, yBottom - 0.12, spec.w + 0.55);
   }
 }
 
@@ -1055,14 +1190,15 @@ export function listWindowPorts(): WindowPort[] {
     const spec = specFor(o.kind, o.floor);
     if (spec.door) continue;
     if (spec.shutter === "closed") continue;
+    if (spec.blind) continue;
     const yBottom = FLOOR_Y[o.floor] + spec.yOff;
     const yCenter = yBottom + spec.h / 2;
     const p = worldAt(o.face, o.along, yCenter + (spec.arch ? -0.04 : 0.01), 0, 0.055);
     ports.push({
       position: [p.x, p.y, p.z],
       rotationY: faceYaw(o.face),
-      width: spec.arch ? spec.w * 0.66 : spec.w * 0.64,
-      height: spec.arch ? spec.h * 0.68 : spec.h * 0.7,
+      width: spec.arch ? spec.w * 0.8 : spec.w * 0.78,
+      height: spec.arch ? spec.h * 0.78 : spec.h * 0.8,
       floor: o.floor,
       room: roomFor(o),
     });
@@ -1073,17 +1209,9 @@ export function listWindowPorts(): WindowPort[] {
 export type CasaGeos = Record<MatId, THREE.BufferGeometry>;
 
 function addStreetKit(b: Batches) {
-  const box = worldAt("front", -1.35, 0.72, 0, 0.08);
-  addBox(b.iron, 0.44, 0.56, 0.08, box.x, box.y, box.z, box.ry);
-  const pipe = worldAt("front", -1.55, 2.2, 0, 0.07);
-  addBox(b.iron, 0.045, 4.0, 0.045, pipe.x, pipe.y, pipe.z);
-  const elbow = worldAt("front", -1.35, 0.48, 0, 0.1);
-  addBox(b.iron, 0.38, 0.04, 0.04, elbow.x, elbow.y, elbow.z, elbow.ry);
-  const mail = worldAt("front", 1.55, 0.74, 0, 0.2);
-  addCyl(b.iron, 0.17, 0.17, 0.56, mail.x, mail.y, mail.z, 8);
-  addBox(b.iron, 0.045, 0.74, 0.045, mail.x, 0.37, mail.z);
-  const bell = worldAt("front", 0.95, 1.38, 0, 0.08);
-  addBox(b.iron, 0.12, 0.16, 0.06, bell.x, bell.y, bell.z, bell.ry);
+  // Brass buzzer plate beside the door jamb, like the reference photo.
+  const bell = worldAt("front", 1.18, 1.52, 0, 0.05);
+  addBox(b.iron, 0.14, 0.2, 0.045, bell.x, bell.y, bell.z, bell.ry);
 }
 
 export function buildCasa(): CasaGeos {
