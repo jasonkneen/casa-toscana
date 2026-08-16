@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 import type { Face, MatId, Opening, OpeningKind, RoomId, WindowPort } from "@/lib/building/geometry";
 
-export const BUILD_REV = 22;
+export const BUILD_REV = 23;
 
 export type HousePlan = {
   id: string;
@@ -299,26 +299,22 @@ function slabsAround(gaps: { a0: number; a1: number }[], left: number, right: nu
 }
 
 function addDadoAndKit(b: Batches, p: HousePlan) {
-  const h = 1.18;
-  const t = 0.03;
+  // Low stone base course broken around the doors — the tall ashlar dado
+  // read as false against the elevation sheet.
+  const h = 0.38;
+  const t = 0.05;
   const hw = p.W / 2;
   const hd = p.D / 2;
   const gaps = frontDoorGaps(p);
   for (const s of slabsAround(gaps, -hw + 0.04, hw - 0.04)) {
-    addBox(b.stone, s.x1 - s.x0, h, t, (s.x0 + s.x1) / 2, h / 2, hd + 0.012, 0, 0.45);
+    addBox(b.stone, s.x1 - s.x0, h, t, (s.x0 + s.x1) / 2, h / 2, hd + 0.012, 0, 0.5);
   }
   const streetLen = Math.max(0.2, hd - p.brickSplit);
-  addBox(b.stone, t, h, streetLen, -hw - 0.01, h / 2, (hd + p.brickSplit) / 2, 0, 0.45);
-  addBox(b.stone, t, h, streetLen, hw + 0.01, h / 2, (hd + p.brickSplit) / 2, 0, 0.45);
+  addBox(b.stone, t, h, streetLen, -hw - 0.01, h / 2, (hd + p.brickSplit) / 2, 0, 0.5);
+  addBox(b.stone, t, h, streetLen, hw + 0.01, h / 2, (hd + p.brickSplit) / 2, 0, 0.5);
   if (p.catalog) return;
   const door = p.openings.find((o) => o.face === "front" && o.floor === 0 && specFor(o.kind, 0).door);
   const along = door?.along ?? 0;
-  const box = worldAt(p, "front", along - 1.15, 0.72, 0, 0.08);
-  addBox(b.iron, 0.42, 0.55, 0.08, box.x, box.y, box.z, box.ry);
-  const pipe = worldAt(p, "front", along - 1.35, 2.1, 0, 0.07);
-  addBox(b.iron, 0.045, 3.8, 0.045, pipe.x, pipe.y, pipe.z);
-  const elbow = worldAt(p, "front", along - 1.15, 0.48, 0, 0.1);
-  addBox(b.iron, 0.36, 0.04, 0.04, elbow.x, elbow.y, elbow.z, elbow.ry);
   if (p.mailbox) {
     const m = worldAt(p, "front", along + 1.35, 0.72, 0, 0.18);
     addCyl(b.iron, 0.16, 0.16, 0.55, m.x, m.y, m.z);
@@ -369,48 +365,38 @@ function addBands(b: Batches, p: HousePlan) {
 }
 
 function addQuoins(b: Batches, p: HousePlan) {
+  // Flat continuous pietra-serena corner chains on the two street corners
+  // only — same treatment the hero earned from the elevation sheet.
   const hw = p.W / 2;
   const hd = p.D / 2;
-  const thick = 0.11;
-  const lift = thick / 2 + 0.012;
-  const flush = lift + thick / 2;
-  const bays = p.openings.map((o) => {
-    const s = specFor(o.kind, o.floor);
-    const pad = s.w / 2 + (s.shutter !== "none" ? s.w * 0.52 + 0.24 : s.door ? s.w * 0.2 + 0.28 : 0.18);
-    return {
-      face: o.face,
-      a0: o.along - pad,
-      a1: o.along + pad,
-      y0: p.floorY[o.floor] + s.yOff - 0.2,
-      y1: p.floorY[o.floor] + s.yOff + s.h + 0.35,
-    };
-  });
-  const hit = (face: Face, a0: number, a1: number, y0: number, y1: number) => {
-    const lo = Math.min(a0, a1);
-    const hi = Math.max(a0, a1);
-    return bays.some((q) => q.face === face && lo < q.a1 && hi > q.a0 && y0 < q.y1 && y1 > q.y0);
-  };
-  let y = 0.55;
-  let i = 0;
-  while (y + 0.16 < p.eaveY - 0.15) {
-    const hh = i % 2 === 0 ? 0.3 : 0.26;
-    const ext = i % 2 === 0 ? 0.38 : 0.26;
-    const corners: [number, number, number, number, Face, Face][] = [
-      [-hw, hd, 1, 1, "front", "left"],
-      [hw, hd, -1, 1, "front", "right"],
-      [-hw, -hd, 1, -1, "back", "left"],
-      [hw, -hd, -1, -1, "back", "right"],
-    ];
-    for (const [cx, cz, sx, sz, fa, fb] of corners) {
-      if (!hit(fa, cx, cx + sx * ext, y, y + hh)) {
-        addBox(b.stone, ext, hh, thick, cx + sx * (ext / 2), y + hh / 2, cz + sz * lift, 0, 0.7);
-      }
-      if (!hit(fb, cz - sz * ext, cz + sz * flush, y, y + hh)) {
-        addBox(b.stone, thick, hh, ext + flush, cx - sx * lift, y + hh / 2, cz - sz * ((ext - flush) / 2), 0, 0.7);
-      }
+  const thick = 0.035;
+  const lift = thick / 2 + 0.008;
+  const yTop = p.eaveY - 0.16;
+  const corners: [number, number][] = [
+    [-hw, 1],
+    [hw, -1],
+  ];
+  for (const [cx, sx] of corners) {
+    let y = 0.42;
+    let i = 0;
+    while (y < yTop) {
+      const hh = Math.min(i % 2 === 0 ? 0.34 : 0.3, yTop - y);
+      const ext = i % 2 === 0 ? 0.44 : 0.32;
+      addBox(b.stone, ext, hh - 0.008, thick, cx + sx * (ext / 2), y + hh / 2, hd + lift, 0, 0.7);
+      addBox(
+        b.stone,
+        thick,
+        hh - 0.008,
+        i % 2 === 0 ? 0.32 : 0.44,
+        cx - sx * lift,
+        y + hh / 2,
+        hd - (i % 2 === 0 ? 0.32 : 0.44) / 2,
+        0,
+        0.7,
+      );
+      y += hh;
+      i += 1;
     }
-    y += 0.34;
-    i += 1;
   }
 }
 
@@ -642,12 +628,17 @@ function addRoofBits(b: Batches, p: HousePlan) {
   addBox(b.wood, p.W + oh * 2, 0.05, oh * 0.95, 0, p.eaveY - 0.02, -p.D / 2 - oh * 0.48, 0, 0.7);
   addBox(b.wood, oh * 0.95, 0.05, p.D + oh * 2, -p.W / 2 - oh * 0.48, p.eaveY - 0.02, 0, 0, 0.7);
   addBox(b.wood, oh * 0.95, 0.05, p.D + oh * 2, p.W / 2 + oh * 0.48, p.eaveY - 0.02, 0, 0, 0.7);
+  // Stacks pulled toward the ridge, pale stucco bodies, tops just past it.
+  const ridgeY = p.eaveY + p.roofH;
   for (const [x, z, h] of p.chimneys) {
-    const y0 = roofHeightAt(p, x, z) - 0.1;
-    addBox(b.brick, 0.52, h, 0.42, x, y0 + h / 2, z, 0, 0.9);
-    addBox(b.stone, 0.6, 0.07, 0.5, x, y0 + h + 0.04, z, 0, 0.6);
-    addCyl(b.terracotta, 0.1, 0.12, 0.26, x - 0.11, y0 + h + 0.2, z);
-    addCyl(b.terracotta, 0.09, 0.11, 0.22, x + 0.12, y0 + h + 0.18, z + 0.02);
+    const zr = Math.sign(z) * Math.min(Math.abs(z) * 0.35, 0.8);
+    const y0 = roofHeightAt(p, x, zr) - 0.1;
+    const top = ridgeY + 0.5 + Math.min(0.45, h * 0.25);
+    const hh = top - y0;
+    addBox(b.stucco, 0.5, hh, 0.42, x, y0 + hh / 2, zr, 0, 0.9);
+    addBox(b.stone, 0.58, 0.07, 0.5, x, y0 + hh + 0.04, zr, 0, 0.6);
+    addCyl(b.terracotta, 0.1, 0.12, 0.26, x - 0.11, y0 + hh + 0.2, zr);
+    addCyl(b.terracotta, 0.09, 0.11, 0.22, x + 0.12, y0 + hh + 0.18, zr + 0.02);
   }
   for (const side of [-1, 1]) {
     addBox(b.iron, 0.05, p.eaveY - 0.3, 0.05, side * (p.W / 2 + 0.04), (p.eaveY - 0.15) / 2, p.D / 2 - 0.2);
