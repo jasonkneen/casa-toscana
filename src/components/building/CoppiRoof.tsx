@@ -5,15 +5,23 @@ import { EAVE_Y, OVERHANG, ROOF_H, ROOF_RIDGE, W, D, buildRoofFaces } from "@/li
 /**
  * Real coppi: instanced barrel tiles laid in overlapping rows over the four
  * hip faces, with cap runs along the ridge and hips. One InstancedMesh for
- * the field tiles, one for the caps — two draw calls for the whole roof.
+ * the field tiles, one for the caps — two draw calls per roof.
+ *
+ * Parametric over the roof envelope, so the hero and every kin house share
+ * the same builder; `detail` trades tile density for triangles on the kin.
  */
 
-const TILE_R = 0.085;
-const TILE_LEN = 0.52;
-const ROW_STEP = 0.4; // down-slope spacing (overlap = TILE_LEN - ROW_STEP)
-const PITCH = 0.19; // across-slope spacing
-const CAP_R = 0.115;
-const CAP_LEN = 0.5;
+export type CoppiParams = {
+  W: number;
+  D: number;
+  eaveY: number;
+  roofH: number;
+  overhang: number;
+  ridge: number;
+  seed?: number;
+  detail?: "hero" | "kin";
+};
+
 const CAP_STEP = 0.42;
 
 type FaceDef = {
@@ -34,21 +42,17 @@ function mulberry(seed: number) {
   };
 }
 
-function faceDefs(): FaceDef[] {
-  const hx = W / 2 + OVERHANG;
-  const hz = D / 2 + OVERHANG;
-  const y0 = EAVE_Y + 0.04;
-  const y1 = EAVE_Y + ROOF_H;
+function faceDefs(p: CoppiParams): FaceDef[] {
+  const hx = p.W / 2 + p.overhang;
+  const hz = p.D / 2 + p.overhang;
+  const y0 = p.eaveY + 0.04;
+  const y1 = p.eaveY + p.roofH;
   const v = (x: number, y: number, z: number) => new THREE.Vector3(x, y, z);
   return [
-    // front
-    { p0: v(-hx, y0, hz), p1: v(hx, y0, hz), a0: v(-ROOF_RIDGE, y1, 0), a1: v(ROOF_RIDGE, y1, 0) },
-    // back
-    { p0: v(hx, y0, -hz), p1: v(-hx, y0, -hz), a0: v(ROOF_RIDGE, y1, 0), a1: v(-ROOF_RIDGE, y1, 0) },
-    // left
-    { p0: v(-hx, y0, -hz), p1: v(-hx, y0, hz), a0: v(-ROOF_RIDGE, y1, 0), a1: v(-ROOF_RIDGE, y1, 0) },
-    // right
-    { p0: v(hx, y0, hz), p1: v(hx, y0, -hz), a0: v(ROOF_RIDGE, y1, 0), a1: v(ROOF_RIDGE, y1, 0) },
+    { p0: v(-hx, y0, hz), p1: v(hx, y0, hz), a0: v(-p.ridge, y1, 0), a1: v(p.ridge, y1, 0) },
+    { p0: v(hx, y0, -hz), p1: v(-hx, y0, -hz), a0: v(p.ridge, y1, 0), a1: v(-p.ridge, y1, 0) },
+    { p0: v(-hx, y0, -hz), p1: v(-hx, y0, hz), a0: v(-p.ridge, y1, 0), a1: v(-p.ridge, y1, 0) },
+    { p0: v(hx, y0, hz), p1: v(hx, y0, -hz), a0: v(p.ridge, y1, 0), a1: v(p.ridge, y1, 0) },
   ];
 }
 
@@ -69,11 +73,17 @@ function clayColor(rand: () => number): THREE.Color {
   return c;
 }
 
-function buildInstances() {
-  const rand = mulberry(20260816);
+export function buildCoppiInstances(p: CoppiParams) {
+  const kin = p.detail === "kin";
+  const tileLen = kin ? 0.54 : 0.52;
+  const rowStep = kin ? 0.42 : 0.4;
+  const pitch = kin ? 0.21 : 0.19;
+  const tileR = kin ? 0.09 : 0.085;
+
+  const rand = mulberry(p.seed ?? 20260816);
   const tiles: Instance[] = [];
   const caps: Instance[] = [];
-  const faces = faceDefs();
+  const faces = faceDefs(p);
   const normals: THREE.Vector3[] = [];
 
   const u = new THREE.Vector3();
@@ -92,22 +102,22 @@ function buildInstances() {
     n.crossVectors(u, slope).normalize();
     normals.push(n.clone());
 
-    const rows = Math.ceil((slopeLen - 0.12) / ROW_STEP);
+    const rows = Math.ceil((slopeLen - 0.12) / rowStep);
     for (let r = 0; r < rows; r++) {
-      const sAlong = r * ROW_STEP + TILE_LEN * 0.5 - 0.08; // slight eave overhang
+      const sAlong = r * rowStep + tileLen * 0.5 - 0.08; // slight eave overhang
       const t = sAlong / slopeLen;
       if (t > 1 - 0.03 / slopeLen) continue;
       left.lerpVectors(f.p0, f.a0, t);
       right.lerpVectors(f.p1, f.a1, t);
       const width = left.distanceTo(right);
-      const count = Math.floor((width - 0.05) / PITCH);
+      const count = Math.floor((width - 0.05) / pitch);
       if (count < 1) continue;
-      const start = (width - count * PITCH) / 2 + PITCH / 2;
+      const start = (width - count * pitch) / 2 + pitch / 2;
       for (let i = 0; i < count; i++) {
         const pos = left
           .clone()
-          .addScaledVector(u, start + i * PITCH + (rand() - 0.5) * 0.012)
-          .addScaledVector(n, TILE_R * 0.4)
+          .addScaledVector(u, start + i * pitch + (rand() - 0.5) * 0.012)
+          .addScaledVector(n, tileR * 0.4)
           .addScaledVector(slope, (rand() - 0.5) * 0.02);
         m.makeBasis(u, slope, n);
         const quat = new THREE.Quaternion().setFromRotationMatrix(m);
@@ -119,34 +129,30 @@ function buildInstances() {
   }
 
   // ridge caps
-  const y1 = EAVE_Y + ROOF_H;
+  const y1 = p.eaveY + p.roofH;
   {
     const axis = new THREE.Vector3(1, 0, 0);
     const out = new THREE.Vector3(0, 1, 0);
     const side = new THREE.Vector3(0, 0, 1);
-    const len = ROOF_RIDGE * 2 + 0.3;
+    const len = p.ridge * 2 + 0.3;
     const count = Math.ceil(len / CAP_STEP);
     for (let i = 0; i < count; i++) {
-      const x = -ROOF_RIDGE - 0.15 + CAP_STEP * (i + 0.5);
+      const x = -p.ridge - 0.15 + CAP_STEP * (i + 0.5);
       m.makeBasis(side, axis, out);
       const quat = new THREE.Quaternion().setFromRotationMatrix(m);
-      caps.push({
-        pos: new THREE.Vector3(x, y1 + 0.015, 0),
-        quat,
-        color: clayColor(rand),
-      });
+      caps.push({ pos: new THREE.Vector3(x, y1 + 0.015, 0), quat, color: clayColor(rand) });
     }
   }
 
   // hip caps: eave corner -> nearest ridge end, tilted out between the faces
-  const hx = W / 2 + OVERHANG;
-  const hz = D / 2 + OVERHANG;
-  const y0 = EAVE_Y + 0.04;
+  const hx = p.W / 2 + p.overhang;
+  const hz = p.D / 2 + p.overhang;
+  const y0 = p.eaveY + 0.04;
   const hips: [THREE.Vector3, THREE.Vector3, THREE.Vector3][] = [
-    [new THREE.Vector3(-hx, y0, hz), new THREE.Vector3(-ROOF_RIDGE, y1, 0), normals[0].clone().add(normals[2])],
-    [new THREE.Vector3(hx, y0, hz), new THREE.Vector3(ROOF_RIDGE, y1, 0), normals[0].clone().add(normals[3])],
-    [new THREE.Vector3(-hx, y0, -hz), new THREE.Vector3(-ROOF_RIDGE, y1, 0), normals[1].clone().add(normals[2])],
-    [new THREE.Vector3(hx, y0, -hz), new THREE.Vector3(ROOF_RIDGE, y1, 0), normals[1].clone().add(normals[3])],
+    [new THREE.Vector3(-hx, y0, hz), new THREE.Vector3(-p.ridge, y1, 0), normals[0].clone().add(normals[2])],
+    [new THREE.Vector3(hx, y0, hz), new THREE.Vector3(p.ridge, y1, 0), normals[0].clone().add(normals[3])],
+    [new THREE.Vector3(-hx, y0, -hz), new THREE.Vector3(-p.ridge, y1, 0), normals[1].clone().add(normals[2])],
+    [new THREE.Vector3(hx, y0, -hz), new THREE.Vector3(p.ridge, y1, 0), normals[1].clone().add(normals[3])],
   ];
   for (const [from, to, outSum] of hips) {
     const dir = new THREE.Vector3().subVectors(to, from);
@@ -167,7 +173,7 @@ function buildInstances() {
     }
   }
 
-  return { tiles, caps };
+  return { tiles, caps, tileR, tileLen };
 }
 
 function useInstanced(list: Instance[], geo: THREE.BufferGeometry, mat: THREE.Material) {
@@ -188,20 +194,32 @@ function useInstanced(list: Instance[], geo: THREE.BufferGeometry, mat: THREE.Ma
   }, [list, geo, mat]);
 }
 
-export function CoppiRoof({ wireframe = false }: { wireframe?: boolean }) {
-  const { tiles, caps } = useMemo(() => buildInstances(), []);
-  const baseFaces = useMemo(() => buildRoofFaces(), []);
+export function CoppiInstances({
+  params,
+  faces,
+  wireframe = false,
+}: {
+  params: CoppiParams;
+  faces: THREE.BufferGeometry[];
+  wireframe?: boolean;
+}) {
+  const kin = params.detail === "kin";
+  const built = useMemo(
+    () => buildCoppiInstances(params),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [params.W, params.D, params.eaveY, params.roofH, params.overhang, params.ridge, params.seed, params.detail],
+  );
 
   const tileGeo = useMemo(() => {
-    const g = new THREE.CylinderGeometry(TILE_R, TILE_R * 0.86, TILE_LEN, 7, 1, true, 0, Math.PI);
+    const g = new THREE.CylinderGeometry(built.tileR, built.tileR * 0.86, built.tileLen, kin ? 5 : 7, 1, true, 0, Math.PI);
     g.rotateY(-Math.PI / 2); // bulge along +Z (outward)
     return g;
-  }, []);
+  }, [built, kin]);
   const capGeo = useMemo(() => {
-    const g = new THREE.CylinderGeometry(CAP_R, CAP_R * 0.9, CAP_LEN, 8, 1, true, 0, Math.PI);
+    const g = new THREE.CylinderGeometry(0.115, 0.115 * 0.9, 0.5, kin ? 6 : 8, 1, true, 0, Math.PI);
     g.rotateY(-Math.PI / 2);
     return g;
-  }, []);
+  }, [kin]);
   const tileMat = useMemo(
     () =>
       new THREE.MeshStandardMaterial({
@@ -214,12 +232,12 @@ export function CoppiRoof({ wireframe = false }: { wireframe?: boolean }) {
     [wireframe],
   );
 
-  const tileMesh = useInstanced(tiles, tileGeo, tileMat);
-  const capMesh = useInstanced(caps, capGeo, tileMat);
+  const tileMesh = useInstanced(built.tiles, tileGeo, tileMat);
+  const capMesh = useInstanced(built.caps, capGeo, tileMat);
 
   return (
     <group name="CoppiRoof">
-      {baseFaces.map((g, i) => (
+      {faces.map((g, i) => (
         <mesh key={i} geometry={g} receiveShadow frustumCulled={false} dispose={null}>
           <meshStandardMaterial color="#6e4530" roughness={0.95} wireframe={wireframe} />
         </mesh>
@@ -228,4 +246,20 @@ export function CoppiRoof({ wireframe = false }: { wireframe?: boolean }) {
       <primitive object={capMesh} />
     </group>
   );
+}
+
+const HERO_PARAMS: CoppiParams = {
+  W,
+  D,
+  eaveY: EAVE_Y,
+  roofH: ROOF_H,
+  overhang: OVERHANG,
+  ridge: ROOF_RIDGE,
+  seed: 20260816,
+  detail: "hero",
+};
+
+export function CoppiRoof({ wireframe = false }: { wireframe?: boolean }) {
+  const baseFaces = useMemo(() => buildRoofFaces(), []);
+  return <CoppiInstances params={HERO_PARAMS} faces={baseFaces} wireframe={wireframe} />;
 }

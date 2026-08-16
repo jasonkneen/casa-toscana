@@ -4,6 +4,7 @@ import { BUILD_REV, buildHouse, type HousePlan } from "@/lib/building/houseBuild
 import type { MatId } from "@/lib/building/geometry";
 import { NumberPlate } from "@/components/building/NumberPlate";
 import { applyWeathering } from "@/lib/building/weathering";
+import { CoppiInstances, type CoppiParams } from "@/components/building/CoppiRoof";
 
 const ORDER: MatId[] = [
   "stucco",
@@ -35,8 +36,20 @@ export function TuscanHouse({
   label?: string;
 }) {
   const built = useMemo(() => buildHouse(plan), [plan, BUILD_REV]);
-  const roofMap = textures["/textures/roof.jpg"];
-  const roofBump = textures["/textures/roof_bump.jpg"];
+  const coppi = useMemo<CoppiParams>(() => {
+    let seed = 7;
+    for (const ch of plan.id) seed = (seed * 33 + ch.charCodeAt(0)) >>> 0;
+    return {
+      W: plan.W,
+      D: plan.D,
+      eaveY: plan.eaveY,
+      roofH: plan.roofH,
+      overhang: plan.overhang,
+      ridge: Math.max(0.35, (plan.W - plan.D) / 2 + 0.15),
+      seed,
+      detail: "kin",
+    };
+  }, [plan]);
 
   return (
     <group position={position} rotation={[0, yaw, 0]} name={plan.id}>
@@ -110,19 +123,9 @@ export function TuscanHouse({
           </mesh>
         );
       })}
-      {built.roof.map((g, i) => (
-        <mesh key={`r${i}`} geometry={g} castShadow receiveShadow frustumCulled={false} dispose={null}>
-          <meshStandardMaterial
-            map={roofMap}
-            bumpMap={wireframe ? undefined : roofBump}
-            bumpScale={0.05}
-            color="#e8d2b6"
-            roughness={0.7}
-            side={THREE.DoubleSide}
-            wireframe={wireframe}
-          />
-        </mesh>
-      ))}
+      {built.roof.length > 0 ? (
+        <CoppiInstances params={coppi} faces={built.roof} wireframe={wireframe} />
+      ) : null}
       {plan.number ? (
         <NumberPlate n={plan.number} position={[plan.W * 0.22, 2.55, plan.D / 2 + 0.05]} />
       ) : null}
