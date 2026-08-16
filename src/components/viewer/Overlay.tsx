@@ -10,7 +10,7 @@ export const VIEWS: { id: ViewId; label: string; pos: [number, number, number]; 
   { id: "street", label: "Street", pos: [6, 9.5, 28], look: [0, 6, 2] },
   { id: "three", label: "3/4", pos: [16.8, 10.8, 18.2], look: [0, 7.8, 0] },
   { id: "front", label: "Front", pos: [0, 8.8, 24], look: [0, 7.2, 0] },
-  { id: "demo", label: "Parts", pos: [32, 2.2, 17], look: [46, 1.7, 17] },
+  { id: "demo", label: "Parts", pos: [23, 5.2, 55], look: [46, 1.6, 14] },
   { id: "d18", label: "18", pos: [0, 1.65, 7.4], look: [0, 1.45, 4.7] },
   { id: "d25", label: "25", pos: [-10.45, 1.55, 7.0], look: [-10.45, 1.4, 4.35] },
   { id: "d9", label: "9", pos: [11.2, 1.55, 6.8], look: [11.2, 1.4, 3.95] },
