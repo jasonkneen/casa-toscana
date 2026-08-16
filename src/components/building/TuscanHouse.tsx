@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { BUILD_REV, buildHouse, type HousePlan } from "@/lib/building/houseBuilder";
 import type { MatId } from "@/lib/building/geometry";
 import { NumberPlate } from "@/components/building/NumberPlate";
+import { applyWeathering } from "@/lib/building/weathering";
 
 const ORDER: MatId[] = [
   "stucco",
@@ -46,6 +47,9 @@ export function TuscanHouse({
         return (
           <mesh key={id} geometry={geo} castShadow receiveShadow frustumCulled={false} dispose={null}>
             <meshStandardMaterial
+              onUpdate={(m: THREE.Material) => {
+                if (!wireframe && (id === "stucco" || id === "brick")) applyWeathering(m, id);
+              }}
               map={
                 isGlass || id === "interior" || id === "iron"
                   ? undefined

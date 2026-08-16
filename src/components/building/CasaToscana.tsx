@@ -14,6 +14,7 @@ import { NumberPlate } from "@/components/building/NumberPlate";
 import { STREET_PLANS } from "@/lib/building/plans";
 import { CATALOG } from "@/lib/building/catalog";
 import { BUILD_REV, buildHouse } from "@/lib/building/houseBuilder";
+import { applyWeathering } from "@/lib/building/weathering";
 import type { WindowPort } from "@/lib/building/geometry";
 
 type Maps = {
@@ -303,6 +304,9 @@ function Part({
       dispose={null}
     >
       <meshStandardMaterial
+        onUpdate={(m: THREE.Material) => {
+          if (!wireframe && (id === "stucco" || id === "brick")) applyWeathering(m, id);
+        }}
         map={isGlass || id === "interior" || id === "iron" ? undefined : map}
         bumpMap={wireframe ? undefined : bump}
         bumpScale={def.bumpScale}
