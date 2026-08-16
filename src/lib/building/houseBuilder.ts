@@ -2,7 +2,7 @@ import * as THREE from "three";
 import * as BufferGeometryUtils from "three/addons/utils/BufferGeometryUtils.js";
 import type { Face, MatId, Opening, OpeningKind, RoomId, WindowPort } from "@/lib/building/geometry";
 
-export const BUILD_REV = 23;
+export const BUILD_REV = 24;
 
 export type HousePlan = {
   id: string;
@@ -159,26 +159,6 @@ function addSeg(
   batch.push(g);
 }
 
-function addOriented(
-  batch: THREE.BufferGeometry[],
-  w: number,
-  h: number,
-  d: number,
-  x: number,
-  y: number,
-  z: number,
-  quat: THREE.Quaternion,
-  uv = 0.6,
-) {
-  const g = new THREE.BoxGeometry(w, h, d);
-  const uvAttr = g.attributes.uv as THREE.BufferAttribute;
-  for (let i = 0; i < uvAttr.count; i++) uvAttr.setXY(i, uvAttr.getX(i) * w * uv, uvAttr.getY(i) * h * uv);
-  const m = new THREE.Matrix4();
-  m.compose(new THREE.Vector3(x, y, z), quat, new THREE.Vector3(1, 1, 1));
-  g.applyMatrix4(m);
-  batch.push(g);
-}
-
 function archSolid(batch: THREE.BufferGeometry[], w: number, h: number, d: number, x: number, y: number, z: number, ry: number) {
   const hw = w / 2;
   const r = Math.min(hw, h * 0.44);
@@ -241,36 +221,6 @@ function archTopAt(lx: number, w: number, h: number, yBottom: number) {
 }
 
 type At = (y: number, lx: number, lz: number) => { x: number; y: number; z: number; ry: number };
-
-function addRusticatedArch(b: Batches, at: At, yBottom: number, w: number, h: number, ry: number) {
-  const spring = h * SPRING;
-  const innerR = w / 2;
-  const jambW = 0.2;
-  const depth = 0.17;
-  const nJamb = 6;
-  const bh = spring / nJamb;
-  for (let i = 0; i < nJamb; i++) {
-    const extra = i % 2 === 0 ? 0.03 : 0;
-    for (const side of [-1, 1]) {
-      const q = at(yBottom + i * bh + bh / 2, side * (innerR + (jambW + extra) / 2), 0.085 + extra * 0.35);
-      addBox(b.stone, jambW + extra, bh - 0.012, depth + extra, q.x, q.y, q.z, ry, 0.55);
-    }
-  }
-  const nV = 9;
-  const cy = yBottom + spring;
-  const qFace = new THREE.Quaternion().setFromEuler(new THREE.Euler(0, ry, 0));
-  for (let i = 0; i < nV; i++) {
-    const a = Math.PI * ((i + 0.5) / nV);
-    const extra = i === 4 ? 0.04 : i % 2 === 0 ? 0.022 : 0;
-    const rm = innerR + (jambW + extra) / 2;
-    const pos = at(cy + Math.sin(a) * rm, Math.cos(a) * rm, 0.085 + extra * 0.35);
-    const radial = new THREE.Vector3(Math.cos(a), Math.sin(a), 0);
-    const tangent = new THREE.Vector3(-Math.sin(a), Math.cos(a), 0);
-    const qLoc = new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().makeBasis(radial, tangent, new THREE.Vector3(0, 0, 1)));
-    const q = qFace.clone().multiply(qLoc);
-    addOriented(b.stone, jambW + extra, (Math.PI * rm) / nV - 0.012, depth + extra, pos.x, pos.y, pos.z, q, 0.55);
-  }
-}
 
 function addThreshold(b: Batches, at: At, yBottom: number, w: number, ry: number) {
   const q = at(yBottom - 0.03, 0, 0.16);
@@ -536,11 +486,12 @@ function addOpening(b: Batches, p: HousePlan, o: Opening) {
   }
 
   if (s.arch && s.door) {
-    if (o.kind === "herringbone") {
+    {
+      // Smooth pietra-serena band, per the hero door photo — the voussoir
+      // ring read as overdone against the references.
       const q = at(yBottom - 0.02, 0, 0.07);
-      archFrame(b.stone, s.w + 0.3, s.h + 0.14, 0.16, 0.14, q.x, yBottom - 0.03, q.z, ry);
-    } else {
-      addRusticatedArch(b, at, yBottom, s.w, s.h, ry);
+      const band = o.kind === "herringbone" ? 0.14 : 0.22;
+      archFrame(b.stone, s.w + band * 2 + 0.02, s.h + band + 0.03, 0.16, band, q.x, yBottom - 0.03, q.z, ry);
     }
     addThreshold(b, at, yBottom, s.w, ry);
     if (o.kind === "arch-door") addWalnutLeaves(b, at, yBottom, s.w, s.h, ry);
@@ -749,7 +700,7 @@ export function buildHouse(p: HousePlan): HouseBuild {
   addDadoAndKit(b, p);
   addBands(b, p);
   addQuoins(b, p);
-  if (!p.catalog) addRoofBits(b, p);
+  if (!p.catalog || p.roofH > 0) addRoofBits(b, p);
   for (const o of p.openings) addOpening(b, p, o);
   const geos = {} as Record<MatId, THREE.BufferGeometry>;
   (Object.keys(b) as MatId[]).forEach((k) => {
@@ -773,5 +724,5 @@ export function buildHouse(p: HousePlan): HouseBuild {
       });
     }
   }
-  return { geos, roof: p.catalog ? [] : buildRoofFaces(p), ports };
+  return { geos, roof: p.catalog && p.roofH <= 0 ? [] : buildRoofFaces(p), ports };
 }

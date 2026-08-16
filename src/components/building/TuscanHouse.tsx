@@ -129,7 +129,13 @@ export function TuscanHouse({
       {plan.number ? (
         <NumberPlate n={plan.number} position={[plan.W * 0.22, 2.55, plan.D / 2 + 0.05]} />
       ) : null}
-      {label ? <NumberPlate n={label} position={[0, plan.eaveY + 0.28, plan.D / 2 + 0.04]} wide /> : null}
+      {label ? (
+        <NumberPlate
+          n={label}
+          position={[0, plan.eaveY + (plan.roofH > 0 ? plan.roofH + 0.34 : 0.28), plan.D / 2 + 0.04]}
+          wide
+        />
+      ) : null}
     </group>
   );
 }
