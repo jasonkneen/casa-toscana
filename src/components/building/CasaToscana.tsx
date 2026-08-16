@@ -5,7 +5,6 @@ import {
   ASSET_META,
   GEOM_REV,
   buildCasa,
-  buildRoofFaces,
   type MatId,
 } from "@/lib/building/geometry";
 import { InteriorPortals } from "@/components/building/InteriorPortals";
@@ -15,6 +14,7 @@ import { STREET_PLANS } from "@/lib/building/plans";
 import { CATALOG } from "@/lib/building/catalog";
 import { BUILD_REV, buildHouse } from "@/lib/building/houseBuilder";
 import { applyWeathering } from "@/lib/building/weathering";
+import { CoppiRoof } from "@/components/building/CoppiRoof";
 import type { WindowPort } from "@/lib/building/geometry";
 
 type Maps = {
@@ -181,11 +181,6 @@ export function CasaToscana({
 }) {
   const textures = usePreparedTextures();
   const geos = useMemo(() => buildCasa(), [GEOM_REV]);
-  const roofFaces = useMemo(() => buildRoofFaces(), [GEOM_REV]);
-
-  const roofDef = MATS.roof;
-  const roofMap = textures[roofDef.map];
-  const roofBump = roofDef.bump ? textures[roofDef.bump] : undefined;
 
   const extraPorts = useMemo(() => {
     const all: WindowPort[] = [];
@@ -218,30 +213,7 @@ export function CasaToscana({
           frost={frost}
         />
       ))}
-      {roofFaces.map((g, i) => (
-        <mesh
-          key={`roof-${i}`}
-          name={`roof-face-${i}`}
-          geometry={g}
-          castShadow
-          receiveShadow
-          frustumCulled={false}
-          dispose={null}
-        >
-          <meshStandardMaterial
-            map={roofMap}
-            bumpMap={wireframe ? undefined : roofBump}
-            bumpScale={roofDef.bumpScale}
-            color={roofDef.color ?? "#ffffff"}
-            roughness={roofDef.roughness}
-            metalness={0}
-            wireframe={wireframe}
-            side={THREE.DoubleSide}
-            depthWrite
-            depthTest
-          />
-        </mesh>
-      ))}
+      <CoppiRoof wireframe={wireframe} />
       {heroOnly ? null : STREET_PLANS.map((row) => (
         <TuscanHouse
           key={row.plan.id}
